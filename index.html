@@ -1,0 +1,2278 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>DBT Master - Interactive Study Games</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap');
+
+        :root {
+            --bg-primary: #0a0a1a;
+            --bg-secondary: #12122a;
+            --bg-card: #1a1a3e;
+            --bg-card-hover: #222255;
+            --accent-1: #6c5ce7;
+            --accent-2: #a29bfe;
+            --accent-3: #fd79a8;
+            --accent-4: #00cec9;
+            --accent-5: #ffeaa7;
+            --accent-6: #55efc4;
+            --text-primary: #ffffff;
+            --text-secondary: #b8b8d4;
+            --text-muted: #6c6c8a;
+            --success: #00b894;
+            --error: #e17055;
+            --warning: #fdcb6e;
+            --gradient-1: linear-gradient(135deg, #6c5ce7, #a29bfe);
+            --gradient-2: linear-gradient(135deg, #fd79a8, #e84393);
+            --gradient-3: linear-gradient(135deg, #00cec9, #55efc4);
+            --gradient-4: linear-gradient(135deg, #fdcb6e, #f39c12);
+            --gradient-5: linear-gradient(135deg, #6c5ce7, #fd79a8);
+            --shadow-glow: 0 0 30px rgba(108, 92, 231, 0.3);
+            --radius: 16px;
+            --radius-sm: 10px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background:
+                radial-gradient(ellipse at 20% 20%, rgba(108, 92, 231, 0.08) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(253, 121, 168, 0.06) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 50%, rgba(0, 206, 201, 0.04) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .app {
+            position: relative;
+            z-index: 1;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 16px;
+        }
+
+        .header {
+            text-align: center;
+            padding: 30px 20px;
+            margin-bottom: 24px;
+        }
+
+        .header-logo {
+            font-size: 3rem;
+            margin-bottom: 8px;
+            filter: drop-shadow(0 0 20px rgba(108, 92, 231, 0.5));
+        }
+
+        .header h1 {
+            font-size: 2.2rem;
+            font-weight: 900;
+            background: var(--gradient-5);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -1px;
+        }
+
+        .header p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            margin-top: 6px;
+            font-weight: 300;
+        }
+
+        .stats-bar {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+            overflow-x: auto;
+            padding: 4px 0;
+            scrollbar-width: none;
+        }
+
+        .stats-bar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .stat-chip {
+            flex-shrink: 0;
+            background: var(--bg-card);
+            border: 1px solid rgba(108, 92, 231, 0.2);
+            border-radius: 12px;
+            padding: 12px 18px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85rem;
+        }
+
+        .stat-chip .stat-icon {
+            font-size: 1.2rem;
+        }
+
+        .stat-chip .stat-value {
+            font-weight: 700;
+            color: var(--accent-2);
+        }
+
+        .stat-chip .stat-label {
+            color: var(--text-muted);
+            font-size: 0.75rem;
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 24px;
+            overflow-x: auto;
+            padding: 4px;
+            background: var(--bg-secondary);
+            border-radius: 14px;
+            scrollbar-width: none;
+        }
+
+        .nav-tabs::-webkit-scrollbar {
+            display: none;
+        }
+
+        .nav-tab {
+            flex-shrink: 0;
+            padding: 10px 18px;
+            border: none;
+            background: transparent;
+            color: var(--text-muted);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 600;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+
+        .nav-tab.active {
+            background: var(--gradient-1);
+            color: white;
+            box-shadow: 0 4px 15px rgba(108, 92, 231, 0.4);
+        }
+
+        .nav-tab:hover:not(.active) {
+            color: var(--text-primary);
+            background: rgba(108, 92, 231, 0.1);
+        }
+
+        .section {
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.05);
+            }
+        }
+
+        @keyframes shake {
+
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+
+            25% {
+                transform: translateX(-5px);
+            }
+
+            75% {
+                transform: translateX(5px);
+            }
+        }
+
+        .game-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .game-card {
+            background: var(--bg-card);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: var(--radius);
+            padding: 24px;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .game-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            border-radius: var(--radius) var(--radius) 0 0;
+        }
+
+        .game-card:nth-child(4n+1)::before {
+            background: var(--gradient-1);
+        }
+
+        .game-card:nth-child(4n+2)::before {
+            background: var(--gradient-2);
+        }
+
+        .game-card:nth-child(4n+3)::before {
+            background: var(--gradient-3);
+        }
+
+        .game-card:nth-child(4n+4)::before {
+            background: var(--gradient-4);
+        }
+
+        .game-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(108, 92, 231, 0.3);
+            box-shadow: var(--shadow-glow);
+        }
+
+        .game-card .card-icon {
+            font-size: 2.5rem;
+            margin-bottom: 12px;
+        }
+
+        .game-card h3 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .game-card p {
+            color: var(--text-secondary);
+            font-size: 0.82rem;
+            line-height: 1.5;
+        }
+
+        .game-card .card-badge {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            background: rgba(108, 92, 231, 0.2);
+            color: var(--accent-2);
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 20px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .game-area {
+            background: var(--bg-card);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: var(--radius);
+            padding: 28px;
+            margin-bottom: 20px;
+        }
+
+        .game-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .game-title {
+            font-size: 1.3rem;
+            font-weight: 800;
+        }
+
+        .game-meta {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+        }
+
+        .game-meta span {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .back-btn {
+            background: rgba(108, 92, 231, 0.15);
+            border: 1px solid rgba(108, 92, 231, 0.3);
+            color: var(--accent-2);
+            padding: 8px 16px;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            font-size: 0.85rem;
+            transition: all 0.3s;
+        }
+
+        .back-btn:hover {
+            background: rgba(108, 92, 231, 0.3);
+        }
+
+        .flashcard-container {
+            perspective: 1000px;
+            margin: 20px auto;
+            max-width: 600px;
+        }
+
+        .flashcard {
+            width: 100%;
+            min-height: 280px;
+            position: relative;
+            cursor: pointer;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+        }
+
+        .flashcard.flipped {
+            transform: rotateY(180deg);
+        }
+
+        .flashcard-face {
+            position: absolute;
+            inset: 0;
+            backface-visibility: hidden;
+            border-radius: var(--radius);
+            padding: 32px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .flashcard-front {
+            background: var(--gradient-1);
+        }
+
+        .flashcard-back {
+            background: var(--gradient-3);
+            transform: rotateY(180deg);
+        }
+
+        .flashcard-face h3 {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            opacity: 0.8;
+            margin-bottom: 16px;
+        }
+
+        .flashcard-face p {
+            font-size: 1.1rem;
+            line-height: 1.7;
+            font-weight: 500;
+        }
+
+        .flashcard-face .card-module {
+            position: absolute;
+            top: 16px;
+            left: 16px;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .flashcard-nav {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 20px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .flashcard-nav button {
+            padding: 10px 24px;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-prev,
+        .btn-next {
+            background: var(--bg-card);
+            border: 1px solid rgba(108, 92, 231, 0.3) !important;
+            color: var(--text-primary);
+        }
+
+        .btn-prev:hover,
+        .btn-next:hover {
+            background: rgba(108, 92, 231, 0.2);
+        }
+
+        .btn-know {
+            background: var(--success) !important;
+            color: white;
+        }
+
+        .btn-dunno {
+            background: var(--error) !important;
+            color: white;
+        }
+
+        .card-counter {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            font-weight: 600;
+            min-width: 80px;
+            text-align: center;
+        }
+
+        .question-container {
+            margin-bottom: 24px;
+            animation: slideUp 0.3s ease;
+        }
+
+        .question-number {
+            font-size: 0.8rem;
+            color: var(--accent-4);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        .question-text {
+            font-size: 1.15rem;
+            font-weight: 600;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .question-module-tag {
+            display: inline-block;
+            background: rgba(108, 92, 231, 0.15);
+            color: var(--accent-2);
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .option-btn {
+            background: var(--bg-secondary);
+            border: 2px solid rgba(255, 255, 255, 0.08);
+            border-radius: var(--radius-sm);
+            padding: 16px 20px;
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            line-height: 1.5;
+        }
+
+        .option-btn:hover:not(.disabled) {
+            border-color: var(--accent-2);
+            background: rgba(108, 92, 231, 0.1);
+        }
+
+        .option-btn .option-letter {
+            background: rgba(108, 92, 231, 0.2);
+            color: var(--accent-2);
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            flex-shrink: 0;
+        }
+
+        .option-btn.correct {
+            border-color: var(--success) !important;
+            background: rgba(0, 184, 148, 0.15) !important;
+        }
+
+        .option-btn.correct .option-letter {
+            background: var(--success);
+            color: white;
+        }
+
+        .option-btn.incorrect {
+            border-color: var(--error) !important;
+            background: rgba(225, 112, 85, 0.15) !important;
+            animation: shake 0.3s ease;
+        }
+
+        .option-btn.incorrect .option-letter {
+            background: var(--error);
+            color: white;
+        }
+
+        .option-btn.disabled {
+            pointer-events: none;
+        }
+
+        .fill-blank-input {
+            width: 100%;
+            background: var(--bg-secondary);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--radius-sm);
+            padding: 16px 20px;
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        .fill-blank-input:focus {
+            border-color: var(--accent-2);
+            box-shadow: 0 0 20px rgba(108, 92, 231, 0.2);
+        }
+
+        .fill-blank-input.correct-input {
+            border-color: var(--success);
+            background: rgba(0, 184, 148, 0.1);
+        }
+
+        .fill-blank-input.incorrect-input {
+            border-color: var(--error);
+            background: rgba(225, 112, 85, 0.1);
+        }
+
+        .submit-btn {
+            background: var(--gradient-1);
+            border: none;
+            color: white;
+            padding: 12px 32px;
+            border-radius: var(--radius-sm);
+            font-family: 'Inter', sans-serif;
+            font-weight: 700;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 12px;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(108, 92, 231, 0.4);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+            box-shadow: none !important;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: var(--bg-secondary);
+            border-radius: 10px;
+            margin-bottom: 24px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--gradient-1);
+            border-radius: 10px;
+            transition: width 0.5s ease;
+        }
+
+        .score-display {
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .score-circle {
+            width: 160px;
+            height: 160px;
+            border-radius: 50%;
+            margin: 0 auto 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            font-weight: 900;
+            position: relative;
+        }
+
+        .score-circle::before {
+            content: '';
+            position: absolute;
+            inset: -4px;
+            border-radius: 50%;
+            padding: 4px;
+            background: var(--gradient-5);
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+        }
+
+        .score-grade {
+            font-size: 1.5rem;
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+
+        .score-detail {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 24px;
+            line-height: 1.6;
+        }
+
+        .match-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 10px;
+        }
+
+        .match-card {
+            background: var(--bg-secondary);
+            border: 2px solid rgba(255, 255, 255, 0.08);
+            border-radius: var(--radius-sm);
+            padding: 16px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.82rem;
+            font-weight: 500;
+            line-height: 1.4;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            user-select: none;
+        }
+
+        .match-card:hover:not(.matched):not(.disabled) {
+            border-color: var(--accent-2);
+            background: rgba(108, 92, 231, 0.1);
+        }
+
+        .match-card.selected {
+            border-color: var(--accent-2);
+            background: rgba(108, 92, 231, 0.2);
+            box-shadow: 0 0 15px rgba(108, 92, 231, 0.3);
+        }
+
+        .match-card.matched {
+            border-color: var(--success);
+            background: rgba(0, 184, 148, 0.15);
+            opacity: 0.7;
+            pointer-events: none;
+        }
+
+        .match-card.wrong {
+            border-color: var(--error);
+            background: rgba(225, 112, 85, 0.15);
+            animation: shake 0.3s ease;
+        }
+
+        .sequence-item {
+            background: var(--bg-secondary);
+            border: 2px solid rgba(255, 255, 255, 0.08);
+            border-radius: var(--radius-sm);
+            padding: 14px 18px;
+            margin: 8px 0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: grab;
+            transition: all 0.3s;
+            touch-action: none;
+            user-select: none;
+        }
+
+        .sequence-item .seq-num {
+            background: rgba(108, 92, 231, 0.2);
+            color: var(--accent-2);
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 0.8rem;
+            flex-shrink: 0;
+        }
+
+        .sequence-item.correct-pos {
+            border-color: var(--success);
+            background: rgba(0, 184, 148, 0.1);
+        }
+
+        .sequence-item.incorrect-pos {
+            border-color: var(--error);
+            background: rgba(225, 112, 85, 0.1);
+        }
+
+        .scenario-box {
+            background: rgba(108, 92, 231, 0.08);
+            border: 1px solid rgba(108, 92, 231, 0.2);
+            border-radius: var(--radius-sm);
+            padding: 20px;
+            margin-bottom: 20px;
+            line-height: 1.7;
+            font-size: 0.95rem;
+        }
+
+        .scenario-box .scenario-label {
+            font-size: 0.75rem;
+            color: var(--accent-4);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        .timer {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 700;
+            font-size: 1rem;
+        }
+
+        .timer.urgent {
+            color: var(--error);
+            animation: pulse 0.5s infinite;
+        }
+
+        .feedback {
+            padding: 16px 20px;
+            border-radius: var(--radius-sm);
+            margin-top: 16px;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            animation: slideUp 0.3s ease;
+        }
+
+        .feedback.correct-feedback {
+            background: rgba(0, 184, 148, 0.12);
+            border: 1px solid rgba(0, 184, 148, 0.3);
+            color: var(--success);
+        }
+
+        .feedback.incorrect-feedback {
+            background: rgba(225, 112, 85, 0.12);
+            border: 1px solid rgba(225, 112, 85, 0.3);
+            color: var(--error);
+        }
+
+        .feedback .feedback-explanation {
+            color: var(--text-secondary);
+            margin-top: 8px;
+            font-size: 0.82rem;
+        }
+
+        .feedback a {
+            color: var(--accent-4);
+            text-decoration: underline;
+            font-weight: 600;
+        }
+
+        .leaderboard-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .leaderboard-table th {
+            text-align: left;
+            padding: 12px 16px;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .leaderboard-table td {
+            padding: 14px 16px;
+            font-size: 0.9rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+        }
+
+        .leaderboard-table tr:hover td {
+            background: rgba(108, 92, 231, 0.05);
+        }
+
+        .rank-badge {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 0.75rem;
+        }
+
+        .rank-1 {
+            background: linear-gradient(135deg, #f39c12, #fdcb6e);
+            color: #000;
+        }
+
+        .rank-2 {
+            background: linear-gradient(135deg, #b2bec3, #dfe6e9);
+            color: #000;
+        }
+
+        .rank-3 {
+            background: linear-gradient(135deg, #e17055, #fab1a0);
+            color: #fff;
+        }
+
+        .filter-pills {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            overflow-x: auto;
+            padding: 4px 0;
+            scrollbar-width: none;
+        }
+
+        .filter-pills::-webkit-scrollbar {
+            display: none;
+        }
+
+        .filter-pill {
+            flex-shrink: 0;
+            padding: 8px 16px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: transparent;
+            color: var(--text-secondary);
+            border-radius: 20px;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+
+        .filter-pill.active {
+            background: var(--gradient-1);
+            border-color: transparent;
+            color: white;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 20px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-content {
+            background: var(--bg-card);
+            border: 1px solid rgba(108, 92, 231, 0.3);
+            border-radius: var(--radius);
+            padding: 32px;
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .modal-content h2 {
+            margin-bottom: 8px;
+            font-size: 1.3rem;
+        }
+
+        .modal-content p {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            margin-bottom: 20px;
+        }
+
+        .modal-content input {
+            width: 100%;
+            padding: 14px 18px;
+            background: var(--bg-secondary);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--radius-sm);
+            color: white;
+            font-family: 'Inter', sans-serif;
+            font-size: 1rem;
+            outline: none;
+            margin-bottom: 16px;
+            transition: all 0.3s;
+        }
+
+        .modal-content input:focus {
+            border-color: var(--accent-2);
+        }
+
+        .info-link {
+            color: var(--accent-4);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.82rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            transition: all 0.3s;
+        }
+
+        .info-link:hover {
+            color: var(--accent-6);
+            text-decoration: underline;
+        }
+
+        .tf-buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .tf-btn {
+            flex: 1;
+            padding: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--radius-sm);
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .tf-btn:hover {
+            border-color: var(--accent-2);
+        }
+
+        .tf-btn.correct-tf {
+            border-color: var(--success);
+            background: rgba(0, 184, 148, 0.15);
+        }
+
+        .tf-btn.incorrect-tf {
+            border-color: var(--error);
+            background: rgba(225, 112, 85, 0.15);
+        }
+
+        .tf-btn.disabled {
+            pointer-events: none;
+        }
+
+        .letter-tiles {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+            margin: 16px 0;
+        }
+
+        .letter-tile {
+            width: 42px;
+            height: 42px;
+            background: var(--bg-secondary);
+            border: 2px solid rgba(108, 92, 231, 0.3);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-transform: uppercase;
+            user-select: none;
+        }
+
+        .letter-tile:hover {
+            border-color: var(--accent-2);
+            background: rgba(108, 92, 231, 0.15);
+        }
+
+        .letter-tile.used {
+            opacity: 0.3;
+            pointer-events: none;
+        }
+
+        .answer-slots {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+            margin: 16px 0;
+            min-height: 50px;
+        }
+
+        .answer-slot {
+            width: 42px;
+            height: 42px;
+            background: rgba(108, 92, 231, 0.1);
+            border: 2px solid rgba(108, 92, 231, 0.2);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .streak-display {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: rgba(253, 203, 110, 0.15);
+            color: var(--warning);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 700;
+        }
+
+        .lb-status {
+            text-align: center;
+            padding: 8px;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .lb-status .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .dot-green {
+            background: var(--success);
+        }
+
+        .dot-yellow {
+            background: var(--warning);
+        }
+
+        .dot-red {
+            background: var(--error);
+        }
+
+        .lb-share-box {
+            background: var(--bg-secondary);
+            border: 1px solid rgba(108, 92, 231, 0.2);
+            border-radius: var(--radius-sm);
+            padding: 12px 16px;
+            margin-top: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .lb-share-box input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: var(--accent-2);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            outline: none;
+        }
+
+        .lb-share-box button {
+            background: var(--gradient-1);
+            border: none;
+            color: white;
+            padding: 6px 14px;
+            border-radius: 8px;
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            font-size: 0.75rem;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        @media (max-width:600px) {
+            .header h1 {
+                font-size: 1.6rem;
+            }
+
+            .header-logo {
+                font-size: 2.5rem;
+            }
+
+            .game-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .match-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .game-area {
+                padding: 20px 16px;
+            }
+
+            .flashcard-face {
+                padding: 24px 16px;
+            }
+
+            .flashcard-face p {
+                font-size: 0.95rem;
+            }
+
+            .nav-tab {
+                padding: 8px 14px;
+                font-size: 0.8rem;
+            }
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(108, 92, 231, 0.3);
+            border-radius: 10px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="app" id="app">
+        <div class="header">
+            <div class="header-logo">🧠</div>
+            <h1>DBT Master</h1>
+            <p>Dialectical Behavior Therapy • Interactive Study Suite</p>
+        </div>
+
+        <div class="stats-bar">
+            <div class="stat-chip">
+                <span class="stat-icon">🔥</span>
+                <div>
+                    <div class="stat-value" id="totalXP">0</div>
+                    <div class="stat-label">XP Earned</div>
+                </div>
+            </div>
+            <div class="stat-chip">
+                <span class="stat-icon">📚</span>
+                <div>
+                    <div class="stat-value" id="cardsStudied">0</div>
+                    <div class="stat-label">Cards Studied</div>
+                </div>
+            </div>
+            <div class="stat-chip">
+                <span class="stat-icon">🎯</span>
+                <div>
+                    <div class="stat-value" id="accuracy">0%</div>
+                    <div class="stat-label">Accuracy</div>
+                </div>
+            </div>
+            <div class="stat-chip">
+                <span class="stat-icon">⚡</span>
+                <div>
+                    <div class="stat-value" id="streakCount">0</div>
+                    <div class="stat-label">Best Streak</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="nav-tabs" id="main-nav">
+            <button class="nav-tab active" data-section="home">🏠 Home</button>
+            <button class="nav-tab" data-section="learn">📖 Learn</button>
+            <button class="nav-tab" data-section="games">🎮 Games</button>
+            <button class="nav-tab" data-section="test">📝 Test</button>
+            <button class="nav-tab" data-section="scores">🏆 Scores</button>
+        </div>
+
+        <!-- HOME -->
+        <div class="section active" id="section-home">
+            <div class="game-area">
+                <h2 style="margin-bottom:8px;">Welcome to DBT Master 🎓</h2>
+                <p style="color:var(--text-secondary);line-height:1.7;margin-bottom:20px;">
+                    Master the four core modules of Dialectical Behavior Therapy through interactive games, flashcards,
+                    and randomized tests. Track your progress and compete on a <strong
+                        style="color:var(--accent-2);">shared public leaderboard</strong>!
+                </p>
+                <div
+                    style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-bottom:20px;">
+                    <div
+                        style="background:rgba(85,239,196,0.1);border:1px solid rgba(85,239,196,0.2);border-radius:12px;padding:16px;">
+                        <div style="font-size:1.5rem;margin-bottom:6px;">🧘</div>
+                        <strong style="color:#55efc4;">Core Mindfulness</strong>
+                        <p style="font-size:0.78rem;color:var(--text-muted);margin-top:4px;">Observe, Describe,
+                            Participate with Wise Mind</p>
+                    </div>
+                    <div
+                        style="background:rgba(253,121,168,0.1);border:1px solid rgba(253,121,168,0.2);border-radius:12px;padding:16px;">
+                        <div style="font-size:1.5rem;margin-bottom:6px;">🌊</div>
+                        <strong style="color:#fd79a8;">Distress Tolerance</strong>
+                        <p style="font-size:0.78rem;color:var(--text-muted);margin-top:4px;">TIPP, STOP, Radical
+                            Acceptance, Crisis Survival</p>
+                    </div>
+                    <div
+                        style="background:rgba(253,203,110,0.1);border:1px solid rgba(253,203,110,0.2);border-radius:12px;padding:16px;">
+                        <div style="font-size:1.5rem;margin-bottom:6px;">💛</div>
+                        <strong style="color:#fdcb6e;">Emotion Regulation</strong>
+                        <p style="font-size:0.78rem;color:var(--text-muted);margin-top:4px;">ABC PLEASE, Check the
+                            Facts, Opposite Action</p>
+                    </div>
+                    <div
+                        style="background:rgba(162,155,254,0.1);border:1px solid rgba(162,155,254,0.2);border-radius:12px;padding:16px;">
+                        <div style="font-size:1.5rem;margin-bottom:6px;">🤝</div>
+                        <strong style="color:#a29bfe;">Interpersonal Effectiveness</strong>
+                        <p style="font-size:0.78rem;color:var(--text-muted);margin-top:4px;">DEAR MAN, GIVE, FAST skills
+                        </p>
+                    </div>
+                </div>
+                <p style="font-size:0.8rem;color:var(--text-muted);">
+                    Based on Marsha Linehan's DBT framework • Updated for 2024–2026 best practices •
+                    <a href="https://behavioraltech.org/resources/faqs/dialectical-behavior-therapy-dbt/"
+                        target="_blank" class="info-link">Learn more about DBT ↗</a>
+                </p>
+            </div>
+        </div>
+
+        <!-- LEARN -->
+        <div class="section" id="section-learn">
+            <div class="filter-pills" id="flashcard-filters"></div>
+            <div id="flashcard-area"></div>
+        </div>
+
+        <!-- GAMES -->
+        <div class="section" id="section-games">
+            <div id="games-menu">
+                <div class="game-grid" id="game-grid"></div>
+            </div>
+            <div id="game-play-area" class="hidden"></div>
+        </div>
+
+        <!-- TEST -->
+        <div class="section" id="section-test">
+            <div id="test-setup">
+                <div class="game-area">
+                    <h2 style="margin-bottom:16px;">📝 Randomized Test Generator</h2>
+                    <p style="color:var(--text-secondary);margin-bottom:24px;">Generate a custom exam with multiple
+                        question types. Each test is unique!</p>
+                    <div style="margin-bottom:16px;">
+                        <label style="font-weight:600;display:block;margin-bottom:8px;">Number of Questions</label>
+                        <select id="test-count"
+                            style="width:100%;padding:12px 16px;background:var(--bg-secondary);border:2px solid rgba(255,255,255,0.1);border-radius:10px;color:white;font-family:'Inter',sans-serif;font-size:1rem;">
+                            <option value="10">10 Questions (Quick)</option>
+                            <option value="20" selected>20 Questions (Standard)</option>
+                            <option value="30">30 Questions (Comprehensive)</option>
+                            <option value="50">50 Questions (Full Exam)</option>
+                        </select>
+                    </div>
+                    <div style="margin-bottom:16px;">
+                        <label style="font-weight:600;display:block;margin-bottom:8px;">Modules</label>
+                        <div style="display:flex;flex-wrap:wrap;gap:8px;">
+                            <label
+                                style="display:flex;align-items:center;gap:6px;cursor:pointer;background:var(--bg-secondary);padding:10px 14px;border-radius:10px;font-size:0.85rem;"><input
+                                    type="checkbox" checked value="mindfulness" class="test-module-check"> 🧘
+                                Mindfulness</label>
+                            <label
+                                style="display:flex;align-items:center;gap:6px;cursor:pointer;background:var(--bg-secondary);padding:10px 14px;border-radius:10px;font-size:0.85rem;"><input
+                                    type="checkbox" checked value="distress" class="test-module-check"> 🌊
+                                Distress</label>
+                            <label
+                                style="display:flex;align-items:center;gap:6px;cursor:pointer;background:var(--bg-secondary);padding:10px 14px;border-radius:10px;font-size:0.85rem;"><input
+                                    type="checkbox" checked value="emotion" class="test-module-check"> 💛
+                                Emotion</label>
+                            <label
+                                style="display:flex;align-items:center;gap:6px;cursor:pointer;background:var(--bg-secondary);padding:10px 14px;border-radius:10px;font-size:0.85rem;"><input
+                                    type="checkbox" checked value="interpersonal" class="test-module-check"> 🤝
+                                Interpersonal</label>
+                        </div>
+                    </div>
+                    <div style="margin-bottom:20px;">
+                        <label style="font-weight:600;display:block;margin-bottom:8px;">Question Types</label>
+                        <div style="display:flex;flex-wrap:wrap;gap:8px;">
+                            <label
+                                style="display:flex;align-items:center;gap:6px;cursor:pointer;background:var(--bg-secondary);padding:10px 14px;border-radius:10px;font-size:0.85rem;"><input
+                                    type="checkbox" checked value="mc" class="test-type-check"> Multiple Choice</label>
+                            <label
+                                style="display:flex;align-items:center;gap:6px;cursor:pointer;background:var(--bg-secondary);padding:10px 14px;border-radius:10px;font-size:0.85rem;"><input
+                                    type="checkbox" checked value="tf" class="test-type-check"> True/False</label>
+                            <label
+                                style="display:flex;align-items:center;gap:6px;cursor:pointer;background:var(--bg-secondary);padding:10px 14px;border-radius:10px;font-size:0.85rem;"><input
+                                    type="checkbox" checked value="fib" class="test-type-check"> Fill in Blank</label>
+                        </div>
+                    </div>
+                    <button class="submit-btn" onclick="startTest()" style="width:100%;">🚀 Generate Test</button>
+                </div>
+            </div>
+            <div id="test-area" class="hidden"></div>
+        </div>
+
+        <!-- SCORES -->
+        <div class="section" id="section-scores">
+            <div class="game-area">
+                <h2 style="margin-bottom:4px;">🏆 Public Leaderboard</h2>
+                <p style="color:var(--text-secondary);font-size:0.85rem;margin-bottom:8px;">Shared scores from all
+                    players worldwide</p>
+                <div class="lb-status" id="lb-status">
+                    <span class="dot dot-yellow"></span> Connecting...
+                </div>
+                <div id="leaderboard-content">
+                    <table class="leaderboard-table">
+                        <thead>
+                            <tr>
+                                <th>Rank</th>
+                                <th>Player</th>
+                                <th>XP</th>
+                                <th>Accuracy</th>
+                                <th>Games</th>
+                            </tr>
+                        </thead>
+                        <tbody id="leaderboard-body">
+                            <tr>
+                                <td colspan="5" style="text-align:center;color:var(--text-muted);padding:40px;">Loading
+                                    leaderboard...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div style="margin-top:20px;text-align:center;">
+                    <button class="submit-btn" onclick="showNameModal()" style="font-size:0.85rem;padding:10px 24px;">✏️
+                        Set Your Name</button>
+                    <button class="submit-btn" onclick="syncLeaderboard()"
+                        style="font-size:0.85rem;padding:10px 24px;background:var(--gradient-3);margin-left:8px;">🔄
+                        Refresh</button>
+                </div>
+                <div class="lb-share-box" id="lb-share-box">
+                    <span style="font-size:0.8rem;color:var(--text-muted);white-space:nowrap;">🔗 Share:</span>
+                    <input type="text" id="share-url" readonly value="" onclick="this.select()">
+                    <button onclick="copyShareURL()">Copy</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Name Modal -->
+    <div class="modal-overlay hidden" id="name-modal">
+        <div class="modal-content">
+            <h2>👋 What's your name?</h2>
+            <p>Enter your name for the public leaderboard</p>
+            <input type="text" id="player-name-input" placeholder="Enter your name..." maxlength="20"
+                autocomplete="off">
+            <button class="submit-btn" onclick="saveName()" style="width:100%;">Save & Play</button>
+        </div>
+    </div>
+
+    <script>
+        // =====================================================
+        // DBT KNOWLEDGE BASE
+        // =====================================================
+        const DBT_DATA = {
+            modules: {
+                mindfulness: { name: "Core Mindfulness", icon: "🧘", color: "#55efc4", link: "https://www.verywellmind.com/dbt-mindfulness-skills-702017" },
+                distress: { name: "Distress Tolerance", icon: "🌊", color: "#fd79a8", link: "https://www.verywellmind.com/dbt-distress-tolerance-skills-702018" },
+                emotion: { name: "Emotion Regulation", icon: "💛", color: "#fdcb6e", link: "https://www.verywellmind.com/dbt-emotion-regulation-skills-702019" },
+                interpersonal: { name: "Interpersonal Effectiveness", icon: "🤝", color: "#a29bfe", link: "https://www.verywellmind.com/dbt-interpersonal-effectiveness-skills-702020" }
+            },
+            concepts: [
+                { id: 1, module: "mindfulness", term: "Wise Mind", definition: "The integration of Reasonable Mind (logic) and Emotion Mind (feelings). The intuitive knowing that combines both reason and emotion to make balanced decisions.", detail: "Wise Mind is accessed through practice and is the middle path between being ruled by logic alone or emotion alone.", link: "https://www.verywellmind.com/what-is-wise-mind-702021" },
+                { id: 2, module: "mindfulness", term: "Reasonable Mind", definition: "A state of mind driven purely by facts, logic, and rational thinking — without influence from emotions.", detail: "While useful for analytical tasks, being stuck in Reasonable Mind can lead to feeling disconnected from values and others." },
+                { id: 3, module: "mindfulness", term: "Emotion Mind", definition: "A state of mind driven by feelings and emotional urges, where thoughts and behaviors are controlled by the current emotional state.", detail: "In Emotion Mind, facts may be distorted or ignored. Actions tend to be impulsive and mood-dependent." },
+                { id: 4, module: "mindfulness", term: "Observe", definition: "A 'What' skill of mindfulness: noticing your experience (thoughts, feelings, sensations) without trying to change it.", detail: "Like watching clouds pass. You notice without grabbing or pushing away. Wordless awareness." },
+                { id: 5, module: "mindfulness", term: "Describe", definition: "A 'What' skill of mindfulness: putting words on your experience, labeling thoughts as thoughts and feelings as feelings.", detail: "Example: Instead of 'I am anxious,' say 'I notice a feeling of anxiety.'" },
+                { id: 6, module: "mindfulness", term: "Participate", definition: "A 'What' skill of mindfulness: fully engaging in the current activity, throwing yourself completely into the present moment.", detail: "Like a dancer becoming the dance. Complete absorption without self-consciousness." },
+                { id: 7, module: "mindfulness", term: "Non-Judgmentally", definition: "A 'How' skill: seeing things as they are without evaluating as good or bad. Replacing judgments with statements of fact.", detail: "Instead of 'This is terrible,' say 'This is happening and I feel uncomfortable.'" },
+                { id: 8, module: "mindfulness", term: "One-Mindfully", definition: "A 'How' skill: doing one thing at a time with full attention, letting go of distractions.", detail: "The opposite of multitasking. When eating, just eat. When listening, just listen." },
+                { id: 9, module: "mindfulness", term: "Effectively", definition: "A 'How' skill: doing what works in the situation, focusing on goals rather than being 'right.'", detail: "Let go of willfulness and useless anger. Focus on what is effective to achieve your objectives." },
+                { id: 10, module: "mindfulness", term: "'What' Skills", definition: "The three mindfulness skills that tell you WHAT to do: Observe, Describe, and Participate.", detail: "These skills help you take hold of your mind and direct your attention to the present moment." },
+                { id: 11, module: "mindfulness", term: "'How' Skills", definition: "The three mindfulness skills that tell you HOW to practice: Non-Judgmentally, One-Mindfully, and Effectively.", detail: "These skills describe the quality of attention you bring to whatever you're doing." },
+                { id: 12, module: "distress", term: "TIPP Skills", definition: "Crisis survival: Temperature (cold water/ice), Intense exercise, Paced breathing, Progressive muscle relaxation.", detail: "TIPP rapidly changes body chemistry to reduce extreme emotional arousal within minutes.", link: "https://www.verywellmind.com/dbt-tipp-skills-702016" },
+                { id: 13, module: "distress", term: "STOP Skill", definition: "Crisis survival: Stop (freeze), Take a step back, Observe what's happening, Proceed mindfully.", detail: "Prevents impulsive actions during emotional crises. Creates a pause between trigger and response." },
+                { id: 14, module: "distress", term: "Radical Acceptance", definition: "Completely accepting reality as it is, right now, without fighting it — not approval, but acknowledgment.", detail: "Pain + Non-acceptance = Suffering. Radical Acceptance reduces suffering by stopping the fight against reality.", link: "https://www.verywellmind.com/what-is-radical-acceptance-5120614" },
+                { id: 15, module: "distress", term: "Distract with ACCEPTS", definition: "Activities, Contributing, Comparisons, Emotions (opposite), Pushing away, Thoughts (other), Sensations.", detail: "Seven ways to distract from distress temporarily. Strategic temporary relief, not avoidance." },
+                { id: 16, module: "distress", term: "Self-Soothe with Five Senses", definition: "Using each of the five senses (vision, hearing, smell, taste, touch) to comfort yourself during distress.", detail: "Examples: nature (vision), music (hearing), aromatherapy (smell), tea (taste), soft blanket (touch)." },
+                { id: 17, module: "distress", term: "IMPROVE the Moment", definition: "Imagery, Meaning, Prayer, Relaxation, One thing in the moment, Vacation (brief), Encouragement.", detail: "These techniques change the quality of the present moment without changing the situation itself." },
+                { id: 18, module: "distress", term: "Pros and Cons", definition: "Listing advantages and disadvantages of both tolerating distress AND not tolerating it (acting on crisis urges).", detail: "Four boxes: pros of tolerating, cons of tolerating, pros of not tolerating, cons of not tolerating." },
+                { id: 19, module: "distress", term: "Turning the Mind", definition: "Choosing to accept reality, over and over. The inner commitment to acceptance that must be renewed repeatedly.", detail: "The bridge between rejection and Radical Acceptance. A choice made at every fork in the road." },
+                { id: 20, module: "distress", term: "Willingness vs. Willfulness", definition: "Willingness: doing what is needed, participating fully. Willfulness: refusing to change, trying to control everything, or giving up.", detail: "Willfulness says 'I won't.' Willingness says 'I'll try' even when it's hard." },
+                { id: 21, module: "distress", term: "Half-Smiling & Willing Hands", definition: "Body-based acceptance: slightly turning up mouth corners and opening hands palms up to signal acceptance to the brain.", detail: "Body posture influences emotion through proprioceptive feedback." },
+                { id: 22, module: "emotion", term: "ABC PLEASE", definition: "Accumulate positive experiences, Build mastery, Cope ahead, treat PhysicaL illness, balance Eating, avoid mood-Altering drugs, balance Sleep, Exercise.", detail: "Proactive skills to reduce vulnerability to negative emotions over time.", link: "https://www.verywellmind.com/dbt-emotion-regulation-skills-702019" },
+                { id: 23, module: "emotion", term: "Check the Facts", definition: "Examining whether your emotional response fits the actual facts. Identify the prompting event, interpretations, and assumptions.", detail: "Steps: Name the emotion, identify the event, list interpretations, check for threat, ask if intensity fits." },
+                { id: 24, module: "emotion", term: "Opposite Action", definition: "Acting opposite to the emotional urge when the emotion does NOT fit the facts or is not effective.", detail: "If afraid (no danger): approach. If angry (unjustified): be gentle. Must be done ALL THE WAY.", link: "https://www.verywellmind.com/opposite-action-2797583" },
+                { id: 25, module: "emotion", term: "Problem Solving", definition: "When the emotion DOES fit the facts: identify the problem, check facts, identify goal, brainstorm, choose, implement, evaluate.", detail: "Used when the emotion is justified and the situation can be changed." },
+                { id: 26, module: "emotion", term: "Model for Describing Emotions", definition: "Prompting Event → Interpretation → Biological Changes → Expression → Action Urge → Aftereffects.", detail: "Emotions are complex responses with multiple components. Intervene at any point to change the experience." },
+                { id: 27, module: "emotion", term: "Accumulate Positive Experiences", definition: "Short-term: do pleasant things daily. Long-term: make changes so positive events occur more often aligned with values.", detail: "The 'A' in ABC PLEASE. Build a 'life worth living.'" },
+                { id: 28, module: "emotion", term: "Build Mastery", definition: "Doing things that build a sense of accomplishment and competence. Choosing activities that are challenging but possible.", detail: "The 'B' in ABC PLEASE. Plan one mastery activity each day." },
+                { id: 29, module: "emotion", term: "Cope Ahead", definition: "Rehearsing a plan for handling emotional situations before they happen. Visualize and practice coping effectively in your mind.", detail: "The 'C' in ABC PLEASE. Describe situation, decide skills, imagine success, practice relaxation." },
+                { id: 30, module: "emotion", term: "PLEASE Skills", definition: "Reduce vulnerability: treat PhysicaL illness, balanced Eating, avoid mood-Altering substances, balanced Sleep, Exercise.", detail: "Taking care of the body directly affects emotional vulnerability." },
+                { id: 31, module: "emotion", term: "Functions of Emotions", definition: "Three functions: communicate to and influence others, organize and motivate action, provide information (self-validation).", detail: "Understanding that emotions have purposes reduces the urge to judge or suppress them." },
+                { id: 32, module: "interpersonal", term: "DEAR MAN", definition: "Objectives effectiveness: Describe, Express, Assert, Reinforce. Stay Mindful, Appear confident, Negotiate.", detail: "Used when you want to get something you need or say no to a request.", link: "https://www.verywellmind.com/dear-man-702036" },
+                { id: 33, module: "interpersonal", term: "GIVE", definition: "Relationship effectiveness: be Gentle, act Interested, Validate, use an Easy manner.", detail: "Used when maintaining or improving the relationship is the priority." },
+                { id: 34, module: "interpersonal", term: "FAST", definition: "Self-respect effectiveness: be Fair, no unnecessary Apologies, Stick to values, be Truthful.", detail: "Prevents sacrificing your values for approval." },
+                { id: 35, module: "interpersonal", term: "Validation", definition: "Communicating that another person's thoughts, feelings, or actions make sense in their context. Six levels exist.", detail: "Validation is NOT agreement. It acknowledges experience as real and understandable.", link: "https://www.verywellmind.com/validation-in-dbt-702034" },
+                { id: 36, module: "interpersonal", term: "Six Levels of Validation", definition: "1) Being present, 2) Accurate reflection, 3) Mind-reading, 4) Understanding from history, 5) Normalizing, 6) Radical genuineness.", detail: "Each level is a deeper form of validation. Level 6 treats the person as a capable equal." },
+                { id: 37, module: "interpersonal", term: "Dialectics", definition: "The synthesis of opposites. The core dialectic is acceptance AND change — both necessary, truth in integration.", detail: "Replaces 'either/or' with 'both/and.' Reality contains contradictions that can be synthesized.", link: "https://behavioraltech.org/resources/faqs/dialectical-behavior-therapy-dbt/" },
+                { id: 38, module: "interpersonal", term: "Walking the Middle Path", definition: "Finding synthesis between opposing positions. Practicing dialectical thinking, validation, and behavior change in relationships.", detail: "Key skills: dialectics, validation, and behaviorism awareness." },
+                { id: 39, module: "mindfulness", term: "States of Mind", definition: "Three states: Reasonable Mind (logic), Emotion Mind (emotion), and Wise Mind (integration of both).", detail: "Everyone moves between states. Wise Mind is the synthesis that considers both logic and emotion." },
+                { id: 40, module: "mindfulness", term: "Beginner's Mind", definition: "Approaching each moment as if for the first time, without preconceptions. Seeing with fresh eyes.", detail: "A Zen concept integrated into DBT. Reduces automatic judgments." },
+                { id: 41, module: "distress", term: "Crisis Survival Skills", definition: "Short-term skills for getting through a crisis without making it worse: TIPP, STOP, ACCEPTS, Self-Soothe, IMPROVE, Pros/Cons.", detail: "NOT long-term solutions. They bridge the gap until the crisis passes." },
+                { id: 42, module: "emotion", term: "The Wave Skill", definition: "Observing your emotion like a wave: it rises, crests, and falls naturally. Don't block, suppress, or act on it.", detail: "Also called 'surfing the emotion.' Non-judgmental awareness of physical sensations." },
+                { id: 43, module: "mindfulness", term: "Teflon Mind", definition: "Letting thoughts and feelings come and go without sticking, like a non-stick pan.", detail: "A metaphor for non-attachment to mental events. Thoughts are just thoughts." },
+                { id: 44, module: "distress", term: "Temperature (TIPP)", definition: "Rapidly cooling the body to activate the dive reflex: hold ice, splash cold water on face, cold shower.", detail: "Triggers the mammalian dive reflex, slowing heart rate. Works within 30-60 seconds." },
+                { id: 45, module: "emotion", term: "Emotional Vulnerability Factors", definition: "Physical illness, sleep deprivation, poor nutrition, substance use, lack of exercise increase vulnerability to negative emotions.", detail: "PLEASE skills directly target these vulnerability factors." },
+                { id: 46, module: "distress", term: "DBT Overview", definition: "Evidence-based treatment by Marsha Linehan combining cognitive-behavioral change strategies with acceptance approaches.", detail: "Standard DBT: individual therapy, skills group, phone coaching, therapist consultation team.", link: "https://behavioraltech.org/resources/faqs/dialectical-behavior-therapy-dbt/" },
+                { id: 47, module: "interpersonal", term: "Interpersonal Priorities", definition: "Three priorities: Objectives (getting what you want), Relationship (maintaining it), Self-Respect (keeping values).", detail: "Use DEAR MAN for objectives, GIVE for relationship, FAST for self-respect." },
+                { id: 48, module: "distress", term: "Reality Acceptance Skills", definition: "Skills for accepting reality: Radical Acceptance, Turning the Mind, Willingness, Half-Smiling/Willing Hands.", detail: "Pain is inevitable; suffering from fighting reality is optional." },
+                { id: 49, module: "emotion", term: "Myth of Emotions", definition: "Common myths: 'There's a right way to feel,' 'Negative emotions are bad,' 'Being emotional = out of control.'", detail: "All emotions serve a function and provide information." },
+                { id: 50, module: "mindfulness", term: "Dialectical Abstinence", definition: "100% commitment to goals combined with complete non-judgmental compassion when lapses occur.", detail: "Before lapse: commit 100%. After: radical acceptance, problem-solve, recommit." }
+            ],
+            trueFalse: [
+                { statement: "Wise Mind is the same as Reasonable Mind.", answer: false, module: "mindfulness", explanation: "Wise Mind integrates BOTH Reasonable Mind and Emotion Mind." },
+                { statement: "Radical Acceptance means you approve of what happened.", answer: false, module: "distress", explanation: "Radical Acceptance is acknowledging reality, NOT approving of it." },
+                { statement: "DEAR MAN is primarily used for maintaining self-respect.", answer: false, module: "interpersonal", explanation: "DEAR MAN is for objectives effectiveness. FAST is for self-respect." },
+                { statement: "TIPP skills are designed for long-term emotion regulation.", answer: false, module: "distress", explanation: "TIPP is a crisis survival skill for rapid, short-term relief." },
+                { statement: "Opposite Action should be used when the emotion DOES fit the facts.", answer: false, module: "emotion", explanation: "Opposite Action is for when emotion does NOT fit facts. Use Problem Solving when it does." },
+                { statement: "The 'What' skills of mindfulness are Observe, Describe, and Participate.", answer: true, module: "mindfulness", explanation: "Correct! These tell you WHAT to do in mindfulness practice." },
+                { statement: "Validation means you agree with the other person.", answer: false, module: "interpersonal", explanation: "Validation acknowledges experience — it does NOT require agreement." },
+                { statement: "PLEASE skills help reduce emotional vulnerability.", answer: true, module: "emotion", explanation: "Correct! PLEASE addresses biological factors that increase vulnerability." },
+                { statement: "In DBT, dialectics means finding the synthesis between opposing ideas.", answer: true, module: "interpersonal", explanation: "Correct! The core dialectic is acceptance AND change." },
+                { statement: "The 'How' skills can all be practiced at the same time.", answer: true, module: "mindfulness", explanation: "Correct! Non-Judgmentally, One-Mindfully, Effectively can be applied simultaneously." },
+                { statement: "Willingness means wanting to do something.", answer: false, module: "distress", explanation: "Willingness is doing what's needed even when you don't want to." },
+                { statement: "GIVE skills are used when the relationship is your top priority.", answer: true, module: "interpersonal", explanation: "Correct! GIVE maintains relationships." },
+                { statement: "Turning the Mind only needs to be done once.", answer: false, module: "distress", explanation: "Turning the Mind must be done over and over." },
+                { statement: "DBT was developed by Marsha Linehan.", answer: true, module: "distress", explanation: "Correct! Originally for borderline personality disorder." },
+                { statement: "Check the Facts involves examining whether your emotional intensity matches the situation.", answer: true, module: "emotion", explanation: "Correct! Verify the prompting event, interpretations, and intensity fit." },
+                { statement: "Half-Smiling works because body posture influences emotional states.", answer: true, module: "distress", explanation: "Correct! Proprioceptive feedback influences brain states." },
+                { statement: "Emotions serve no useful purpose and should be suppressed.", answer: false, module: "emotion", explanation: "Emotions communicate, motivate action, and provide information." },
+                { statement: "ACCEPTS is a distraction skill with seven components.", answer: true, module: "distress", explanation: "Activities, Contributing, Comparisons, Emotions, Pushing away, Thoughts, Sensations." },
+                { statement: "Beginner's Mind means approaching each moment without preconceptions.", answer: true, module: "mindfulness", explanation: "Correct! Seeing with fresh eyes, letting go of assumptions." },
+                { statement: "Problem Solving is used when the emotion does NOT fit the facts.", answer: false, module: "emotion", explanation: "Problem Solving is for when emotion DOES fit. Opposite Action is for when it doesn't." }
+            ],
+            scenarios: [
+                { scenario: "Your friend cancels plans last minute. You feel a surge of anger and want to send a furious text.", question: "Which skill should you use first?", options: ["TIPP Skills", "STOP Skill", "DEAR MAN", "Build Mastery"], correct: 1, module: "distress", explanation: "STOP prevents impulsive reactions to emotional triggers." },
+                { scenario: "You have a job interview tomorrow and feel overwhelming anxiety. You can't sleep.", question: "Which skill combination would best help?", options: ["Radical Acceptance + TIPP", "Cope Ahead + PLEASE", "DEAR MAN + GIVE", "Opposite Action + ACCEPTS"], correct: 1, module: "emotion", explanation: "Cope Ahead rehearses handling the interview; PLEASE skills address sleep." },
+                { scenario: "Your partner says 'You're overreacting' about a conflict.", question: "To address this while maintaining the relationship, use:", options: ["FAST skills only", "DEAR MAN with GIVE", "Radical Acceptance", "Opposite Action"], correct: 1, module: "interpersonal", explanation: "DEAR MAN asserts needs while GIVE maintains the relationship." },
+                { scenario: "In a meeting, your mind races with self-critical thoughts.", question: "Which mindfulness approach should you apply?", options: ["Observe without judgment", "Use Opposite Action", "Apply TIPP skills", "DEAR MAN"], correct: 0, module: "mindfulness", explanation: "Observe — noticing thoughts without engaging — is the foundational skill here." },
+                { scenario: "You're grieving a relationship. You keep thinking 'This shouldn't have happened.'", question: "Which skill addresses the suffering from fighting this reality?", options: ["Problem Solving", "Radical Acceptance", "DEAR MAN", "Build Mastery"], correct: 1, module: "distress", explanation: "Radical Acceptance acknowledges reality. Pain + Non-acceptance = Suffering." },
+                { scenario: "You feel intense sadness after a genuine loss, and the emotion fits the facts.", question: "Since the emotion fits the facts, you should:", options: ["Use Opposite Action", "Use Problem Solving", "Suppress the emotion", "Use TIPP immediately"], correct: 1, module: "emotion", explanation: "When emotion fits facts, use Problem Solving (if situation can change)." }
+            ],
+            acronyms: {
+                TIPP: ["Temperature", "Intense exercise", "Paced breathing", "Progressive muscle relaxation"],
+                STOP: ["Stop", "Take a step back", "Observe", "Proceed mindfully"],
+                DEAR: ["Describe", "Express", "Assert", "Reinforce"],
+                MAN: ["stay Mindful", "Appear confident", "Negotiate"],
+                GIVE: ["Gentle", "Interested", "Validate", "Easy manner"],
+                FAST: ["Fair", "no Apologies", "Stick to values", "Truthful"],
+                ACCEPTS: ["Activities", "Contributing", "Comparisons", "Emotions (opposite)", "Pushing away", "Thoughts", "Sensations"],
+                IMPROVE: ["Imagery", "Meaning", "Prayer", "Relaxation", "One thing", "Vacation", "Encouragement"],
+                PLEASE: ["PhysicaL illness", "Eating", "mood-Altering drugs", "Sleep", "Exercise"],
+                ABC: ["Accumulate positive experiences", "Build mastery", "Cope ahead"]
+            }
+        };
+
+        // =====================================================
+        // STATE
+        // =====================================================
+        let state = {
+            playerName: localStorage.getItem('dbt_name') || '',
+            xp: parseInt(localStorage.getItem('dbt_xp')) || 0,
+            cardsStudied: parseInt(localStorage.getItem('dbt_cards')) || 0,
+            correctAnswers: parseInt(localStorage.getItem('dbt_correct')) || 0,
+            totalAnswers: parseInt(localStorage.getItem('dbt_total')) || 0,
+            bestStreak: parseInt(localStorage.getItem('dbt_streak')) || 0,
+            currentStreak: 0,
+            gamesCompleted: parseInt(localStorage.getItem('dbt_games')) || 0
+        };
+
+        function saveState() {
+            localStorage.setItem('dbt_xp', state.xp);
+            localStorage.setItem('dbt_cards', state.cardsStudied);
+            localStorage.setItem('dbt_correct', state.correctAnswers);
+            localStorage.setItem('dbt_total', state.totalAnswers);
+            localStorage.setItem('dbt_streak', state.bestStreak);
+            localStorage.setItem('dbt_games', state.gamesCompleted);
+            updateStatsDisplay();
+        }
+
+        function addXP(n) { state.xp += n; saveState(); }
+
+        function recordAnswer(correct) {
+            state.totalAnswers++;
+            if (correct) { state.correctAnswers++; state.currentStreak++; if (state.currentStreak > state.bestStreak) state.bestStreak = state.currentStreak; }
+            else state.currentStreak = 0;
+            saveState();
+        }
+
+        function updateStatsDisplay() {
+            document.getElementById('totalXP').textContent = state.xp;
+            document.getElementById('cardsStudied').textContent = state.cardsStudied;
+            document.getElementById('accuracy').textContent = state.totalAnswers > 0 ? Math.round(state.correctAnswers / state.totalAnswers * 100) + '%' : '0%';
+            document.getElementById('streakCount').textContent = state.bestStreak;
+        }
+
+        // =====================================================
+        // SHARED LEADERBOARD (Pantry.cloud / JSON Bin)
+        // =====================================================
+        // REPLACE WITH YOUR PANTRY ID OR JSONBIN URL
+        // Example: https://getpantry.cloud/apiv1/pantry/YOUR-ID/basket/dbtLeaderboard
+        // =====================================================
+        // SHARED LEADERBOARD (Pantry.cloud / JSON Bin)
+        // =====================================================
+        // Updated with your specific Pantry ID and a basket name 'dbtLeaderboard'
+        const API_URL = 'https://getpantry.cloud/apiv1/pantry/d605247a-eef1-43cb-8b62-6faafc53d2f0/basket/dbtLeaderboard';
+        
+        let lbData = [];
+
+        function updateShareURL() {
+            const el = document.getElementById('share-url');
+            if (el) el.value = window.location.origin + window.location.pathname;
+        }
+
+        function copyShareURL() {
+            const el = document.getElementById('share-url');
+            el.select();
+            el.setSelectionRange(0, 99999);
+            navigator.clipboard.writeText(el.value).then(() => {
+                const btn = el.parentElement.querySelector('button');
+                btn.textContent = '✅ Copied!';
+                setTimeout(() => btn.textContent = 'Copy', 2000);
+            }).catch(() => { document.execCommand('copy'); });
+        }
+
+        function setLBStatus(status, color) {
+            const el = document.getElementById('lb-status');
+            el.innerHTML = `<span class="dot dot-${color}"></span> ${status}`;
+        }
+
+        async function fetchLeaderboard() {
+            try {
+                const resp = await fetch(API_URL);
+                if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+                const data = await resp.json();
+                // Pantry returns an object with the key 'scores' because we send it that way below
+                lbData = data.scores || [];
+                localStorage.setItem('dbt_lb_cache', JSON.stringify(lbData));
+                setLBStatus(`Connected • ${lbData.length} players • Synced ✓`, 'green');
+            } catch (e) {
+                console.error('Fetch failed:', e);
+                lbData = JSON.parse(localStorage.getItem('dbt_lb_cache') || '[]');
+                setLBStatus('Offline — showing cached scores', 'red');
+            }
+            renderLeaderboard();
+        }
+
+        async function pushLeaderboard() {
+            if (!state.playerName) return;
+            const entry = {
+                name: state.playerName,
+                xp: state.xp,
+                accuracy: state.totalAnswers > 0 ? Math.round(state.correctAnswers / state.totalAnswers * 100) : 0,
+                games: state.gamesCompleted,
+                updated: new Date().toISOString()
+            };
+            
+            // Local update first to make UI snappy
+            const idx = lbData.findIndex(e => e.name === state.playerName);
+            if (idx >= 0) { if (state.xp >= lbData[idx].xp) lbData[idx] = entry; }
+            else lbData.push(entry);
+            
+            lbData.sort((a, b) => b.xp - a.xp);
+            lbData = lbData.slice(0, 100);
+            localStorage.setItem('dbt_lb_cache', JSON.stringify(lbData));
+            
+            try {
+                // PANTRY FORMATTING: Wrap array in an object key
+                const payload = { scores: lbData };
+                
+                await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                setLBStatus(`Connected • ${lbData.length} players • Synced ✓`, 'green');
+            } catch (e) {
+                console.error('Push failed:', e);
+                setLBStatus('Score saved locally. Sync failed.', 'yellow');
+            }
+            renderLeaderboard();
+        }
+
+        async function syncLeaderboard() {
+            setLBStatus('Syncing...', 'yellow');
+            await fetchLeaderboard();
+            if (state.playerName) await pushLeaderboard();
+        }
+
+        function renderLeaderboard() {
+            const tbody = document.getElementById('leaderboard-body');
+            if (lbData.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:40px;">No scores yet. Be the first to play! 🎮</td></tr>';
+                return;
+            }
+            tbody.innerHTML = lbData.map((e, i) => {
+                const rankClass = i < 3 ? `rank-${i + 1}` : '';
+                const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : '';
+                const isMe = e.name === state.playerName;
+                return `<tr style="${isMe ? 'background:rgba(108,92,231,0.15);' : ''}">
+<td><span class="rank-badge ${rankClass}">${medal || (i + 1)}</span></td>
+<td style="font-weight:${isMe ? '700' : '500'};">${e.name}${isMe ? ' ⭐' : ''}</td>
+<td style="font-weight:700;color:var(--accent-2);">${e.xp}</td>
+<td>${e.accuracy}%</td>
+<td>${e.games}</td>
+</tr>`;
+            }).join('');
+        }
+
+        let syncTimeout = null;
+        function debouncedSync() {
+            if (syncTimeout) clearTimeout(syncTimeout);
+            syncTimeout = setTimeout(() => { if (state.playerName) pushLeaderboard(); }, 5000);
+        }
+
+        const _origSaveState = saveState;
+        saveState = function () {
+            _origSaveState();
+            debouncedSync();
+        };
+
+        // =====================================================
+        // NAME MODAL
+        // =====================================================
+        function showNameModal() {
+            document.getElementById('name-modal').classList.remove('hidden');
+            const inp = document.getElementById('player-name-input');
+            inp.value = state.playerName;
+            inp.focus();
+        }
+
+        function saveName() {
+            const name = document.getElementById('player-name-input').value.trim();
+            if (name) {
+                state.playerName = name;
+                localStorage.setItem('dbt_name', name);
+                saveState();
+                syncLeaderboard(); // Replaces the old invalid code
+            }
+            document.getElementById('name-modal').classList.add('hidden');
+        }
+
+        // =====================================================
+        // NAVIGATION
+        // =====================================================
+        document.getElementById('main-nav').addEventListener('click', e => {
+            const btn = e.target.closest('.nav-tab');
+            if (!btn) return;
+            const section = btn.dataset.section;
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+            document.getElementById('section-' + section).classList.add('active');
+            btn.classList.add('active');
+            if (section === 'learn') initFlashcards();
+            if (section === 'games') { document.getElementById('games-menu').classList.remove('hidden'); document.getElementById('game-play-area').classList.add('hidden'); }
+            if (section === 'scores') syncLeaderboard();
+            if (section === 'test') { document.getElementById('test-setup').classList.remove('hidden'); document.getElementById('test-area').classList.add('hidden'); }
+        });
+
+        function showSection(id) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+            document.getElementById('section-' + id).classList.add('active');
+            document.querySelector(`.nav-tab[data-section="${id}"]`).classList.add('active');
+        }
+
+        // =====================================================
+        // FLASHCARDS
+        // =====================================================
+        let fc = { cards: [], index: 0, filter: 'all', known: new Set() };
+
+        function initFlashcards() {
+            const div = document.getElementById('flashcard-filters');
+            div.innerHTML = `<button class="filter-pill active" onclick="filterCards('all',this)">All</button>
+<button class="filter-pill" onclick="filterCards('mindfulness',this)">🧘 Mindfulness</button>
+<button class="filter-pill" onclick="filterCards('distress',this)">🌊 Distress</button>
+<button class="filter-pill" onclick="filterCards('emotion',this)">💛 Emotion</button>
+<button class="filter-pill" onclick="filterCards('interpersonal',this)">🤝 Interpersonal</button>`;
+            filterCards('all', div.children[0]);
+        }
+
+        function filterCards(mod, btn) {
+            document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
+            btn.classList.add('active');
+            fc.filter = mod;
+            fc.cards = mod === 'all' ? [...DBT_DATA.concepts] : DBT_DATA.concepts.filter(c => c.module === mod);
+            fc.cards = shuffle(fc.cards);
+            fc.index = 0;
+            renderFlashcard();
+        }
+
+        function renderFlashcard() {
+            const area = document.getElementById('flashcard-area');
+            if (!fc.cards.length) { area.innerHTML = '<div class="game-area"><p style="text-align:center;color:var(--text-muted);">No cards.</p></div>'; return; }
+            const card = fc.cards[fc.index], mod = DBT_DATA.modules[card.module];
+            area.innerHTML = `<div class="game-area">
+<div class="progress-bar"><div class="progress-fill" style="width:${(fc.index + 1) / fc.cards.length * 100}%"></div></div>
+<div class="flashcard-container" onclick="document.querySelector('.flashcard').classList.toggle('flipped')">
+<div class="flashcard" id="current-flashcard">
+<div class="flashcard-face flashcard-front">
+<div class="card-module">${mod.icon} ${mod.name}</div>
+<h3>Term</h3>
+<p style="font-size:1.4rem;font-weight:700;">${card.term}</p>
+<p style="font-size:0.75rem;opacity:0.7;margin-top:12px;">Tap to flip</p>
+</div>
+<div class="flashcard-face flashcard-back">
+<div class="card-module">${mod.icon} Definition</div>
+<h3>Definition</h3>
+<p>${card.definition}</p>
+${card.detail ? `<p style="font-size:0.8rem;opacity:0.8;margin-top:12px;">${card.detail}</p>` : ''}
+${card.link ? `<a href="${card.link}" target="_blank" class="info-link" style="margin-top:12px;color:white;opacity:0.9;" onclick="event.stopPropagation();">📖 Learn More ↗</a>` : ''}
+</div>
+</div>
+</div>
+<div class="flashcard-nav">
+<button class="flashcard-nav button btn-prev" onclick="navCard(-1)" ${fc.index === 0 ? 'disabled style="opacity:0.3"' : ''}>← Prev</button>
+<button class="flashcard-nav button btn-dunno" onclick="markCard(false)">❌ Study More</button>
+<span class="card-counter">${fc.index + 1} / ${fc.cards.length}</span>
+<button class="flashcard-nav button btn-know" onclick="markCard(true)">✅ Got It</button>
+<button class="flashcard-nav button btn-next" onclick="navCard(1)" ${fc.index >= fc.cards.length - 1 ? 'disabled style="opacity:0.3"' : ''}>Next →</button>
+</div></div>`;
+        }
+
+        function navCard(d) { fc.index = Math.max(0, Math.min(fc.cards.length - 1, fc.index + d)); renderFlashcard(); }
+
+        function markCard(known) {
+            if (known) { fc.known.add(fc.cards[fc.index].id); addXP(5); }
+            state.cardsStudied++; saveState();
+            if (fc.index < fc.cards.length - 1) { fc.index++; renderFlashcard(); }
+            else {
+                document.getElementById('flashcard-area').innerHTML = `<div class="game-area"><div class="score-display">
+<div class="score-circle" style="background:rgba(108,92,231,0.15);">🎉</div>
+<div class="score-grade">Deck Complete!</div>
+<div class="score-detail">${fc.known.size} of ${fc.cards.length} marked known • +${fc.known.size * 5} XP</div>
+<button class="submit-btn" onclick="initFlashcards()">🔄 Study Again</button>
+</div></div>`;
+            }
+        }
+
+        // =====================================================
+        // GAME ENGINE
+        // =====================================================
+        const games = [
+            { id: 'flashcards', name: 'Flashcard Study', icon: '📇', desc: 'Classic flashcard mode with all DBT terms.', badge: 'Core' },
+            { id: 'mc-quiz', name: 'Multiple Choice', icon: '🎯', desc: 'Random multiple choice questions.', badge: 'Quiz' },
+            { id: 'tf-quiz', name: 'True or False', icon: '✅', desc: 'Rapid true/false about DBT concepts.', badge: 'Speed' },
+            { id: 'fill-blank', name: 'Fill in the Blank', icon: '✏️', desc: 'Complete definitions with missing words.', badge: 'Recall' },
+            { id: 'matching', name: 'Matching Game', icon: '🔗', desc: 'Match terms to definitions.', badge: 'Match' },
+            { id: 'acronym-builder', name: 'Acronym Builder', icon: '🔤', desc: 'Build DBT acronyms letter by letter.', badge: 'Build' },
+            { id: 'scenario', name: 'Scenario Challenge', icon: '🎭', desc: 'Apply skills to realistic scenarios.', badge: 'Applied' },
+            { id: 'module-sort', name: 'Module Sorter', icon: '📦', desc: 'Sort concepts into correct modules.', badge: 'Sort' },
+            { id: 'speed-round', name: 'Speed Round', icon: '⚡', desc: '60-second timed challenge!', badge: 'Timed' },
+            { id: 'word-scramble', name: 'Word Unscramble', icon: '🔀', desc: 'Unscramble letters to reveal terms.', badge: 'Puzzle' },
+            { id: 'sequence', name: 'Skill Sequencer', icon: '📋', desc: 'Put acronym steps in order.', badge: 'Order' },
+            { id: 'connections', name: 'Concept Connections', icon: '🕸️', desc: 'How do DBT concepts relate?', badge: 'Deep' }
+        ];
+
+        let cg = { type: null, data: [], index: 0, score: 0, total: 0, timer: null, timeLeft: 0, matched: null, selected: null, acroIdx: 0, currentAnswer: [], usedIndices: null };
+
+        function initGameGrid() {
+            document.getElementById('game-grid').innerHTML = games.map(g =>
+                `<div class="game-card" onclick="startGame('${g.id}')"><span class="card-badge">${g.badge}</span><div class="card-icon">${g.icon}</div><h3>${g.name}</h3><p>${g.desc}</p></div>`
+            ).join('');
+        }
+
+        function startGame(id) {
+            document.getElementById('games-menu').classList.add('hidden');
+            document.getElementById('game-play-area').classList.remove('hidden');
+            cg = { type: id, data: [], index: 0, score: 0, total: 0, timer: null, timeLeft: 0, matched: new Set(), selected: null, acroIdx: 0, currentAnswer: [], usedIndices: new Set() };
+            const fn = {
+                flashcards: () => { showSection('learn') },
+                'mc-quiz': startMC, 'tf-quiz': startTF, 'fill-blank': startFIB, matching: startMatch,
+                'acronym-builder': startAcro, scenario: startScen, 'module-sort': startSort,
+                'speed-round': startSpeed, 'word-scramble': startScramble, sequence: startSeq, connections: startConn
+            };
+            if (fn[id]) fn[id]();
+        }
+
+        function backToGames() { if (cg.timer) clearInterval(cg.timer); document.getElementById('games-menu').classList.remove('hidden'); document.getElementById('game-play-area').classList.add('hidden'); }
+
+        function gh(title, extra = '') {
+            return `<div class="game-header"><button class="back-btn" onclick="backToGames()">← Back</button><div class="game-title">${title}</div><div class="game-meta">${extra}</div></div>`;
+        }
+
+        function showComplete(score, total, xp, name) {
+            state.gamesCompleted++; addXP(xp);
+            const pct = Math.round(score / total * 100), grade = pct >= 90 ? 'A+' : pct >= 80 ? 'A' : pct >= 70 ? 'B' : pct >= 60 ? 'C' : 'D', emoji = pct >= 90 ? '🌟' : pct >= 80 ? '🎉' : pct >= 70 ? '👍' : '💪';
+            document.getElementById('game-play-area').innerHTML = `<div class="game-area">${gh(name)}
+<div class="score-display"><div class="score-circle" style="background:rgba(108,92,231,0.15);">${emoji}</div>
+<div class="score-grade">Grade: ${grade} (${pct}%)</div>
+<div class="score-detail"><strong>${score}</strong>/${total} correct • +${xp} XP
+${state.currentStreak > 2 ? `<br><span class="streak-display">🔥 ${state.currentStreak} streak!</span>` : ''}</div>
+<div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+<button class="submit-btn" onclick="startGame('${cg.type}')">🔄 Again</button>
+<button class="back-btn" onclick="backToGames()">📋 All Games</button></div></div></div>`;
+        }
+
+        // MULTIPLE CHOICE
+        function startMC() {
+            const cs = shuffle([...DBT_DATA.concepts]).slice(0, 10);
+            cg.data = cs.map(c => { const w = shuffle(DBT_DATA.concepts.filter(x => x.id !== c.id)).slice(0, 3).map(x => x.definition); const o = shuffle([c.definition, ...w]); return { c, o, ci: o.indexOf(c.definition) }; });
+            cg.total = cg.data.length; renderMC();
+        }
+        function renderMC() {
+            const a = document.getElementById('game-play-area');
+            if (cg.index >= cg.data.length) { showComplete(cg.score, cg.total, cg.score * 15, '🎯 Multiple Choice'); return; }
+            const q = cg.data[cg.index], m = DBT_DATA.modules[q.c.module], L = 'ABCD';
+            a.innerHTML = `<div class="game-area">${gh('🎯 Multiple Choice', `<span>Q${cg.index + 1}/${cg.total}</span><span>Score: ${cg.score}</span>`)}
+<div class="progress-bar"><div class="progress-fill" style="width:${cg.index / cg.total * 100}%"></div></div>
+<div class="question-container"><span class="question-module-tag">${m.icon} ${m.name}</span>
+<div class="question-text">What is <strong style="color:var(--accent-2);">"${q.c.term}"</strong>?</div>
+<div class="options-list" id="mc-opts">${q.o.map((o, i) => `<button class="option-btn" onclick="ansMC(${i},${q.ci})"><span class="option-letter">${L[i]}</span><span>${o.length > 120 ? o.substring(0, 117) + '...' : o}</span></button>`).join('')}</div>
+<div id="mc-fb"></div></div></div>`;
+        }
+        function ansMC(s, c) {
+            document.querySelectorAll('#mc-opts .option-btn').forEach((b, i) => { b.classList.add('disabled'); if (i === c) b.classList.add('correct'); if (i === s && i !== c) b.classList.add('incorrect'); });
+            const ok = s === c; if (ok) cg.score++; recordAnswer(ok);
+            const q = cg.data[cg.index];
+            document.getElementById('mc-fb').innerHTML = `<div class="feedback ${ok ? 'correct' : 'incorrect'}-feedback">${ok ? '✅ Correct!' : '❌ Incorrect'}<div class="feedback-explanation">${q.c.detail || ''}${q.c.link ? ` <a href="${q.c.link}" target="_blank">📖 More ↗</a>` : ''}</div></div><button class="submit-btn" onclick="cg.index++;renderMC()">Next →</button>`;
+        }
+
+        // TRUE FALSE
+        function startTF() { cg.data = shuffle([...DBT_DATA.trueFalse]).slice(0, 10); cg.total = cg.data.length; renderTF(); }
+        function renderTF() {
+            const a = document.getElementById('game-play-area');
+            if (cg.index >= cg.data.length) { showComplete(cg.score, cg.total, cg.score * 12, '✅ True or False'); return; }
+            const q = cg.data[cg.index], m = DBT_DATA.modules[q.module];
+            a.innerHTML = `<div class="game-area">${gh('✅ True or False', `<span>Q${cg.index + 1}/${cg.total}</span><span>Score: ${cg.score}</span>`)}
+<div class="progress-bar"><div class="progress-fill" style="width:${cg.index / cg.total * 100}%"></div></div>
+<div class="question-container"><span class="question-module-tag">${m.icon} ${m.name}</span>
+<div class="question-text">"${q.statement}"</div>
+<div class="tf-buttons" id="tf-btns"><button class="tf-btn" onclick="ansTF(true,${q.answer})">✅ TRUE</button><button class="tf-btn" onclick="ansTF(false,${q.answer})">❌ FALSE</button></div>
+<div id="tf-fb"></div></div></div>`;
+        }
+        function ansTF(s, c) {
+            const bs = document.querySelectorAll('#tf-btns .tf-btn'); bs.forEach(b => b.classList.add('disabled'));
+            const ok = s === c; if (ok) cg.score++; recordAnswer(ok);
+            bs[0].classList.add(c === true ? 'correct-tf' : (s === true ? 'incorrect-tf' : ''));
+            bs[1].classList.add(c === false ? 'correct-tf' : (s === false ? 'incorrect-tf' : ''));
+            document.getElementById('tf-fb').innerHTML = `<div class="feedback ${ok ? 'correct' : 'incorrect'}-feedback">${ok ? '✅ Correct!' : `❌ Answer: ${c ? 'TRUE' : 'FALSE'}`}<div class="feedback-explanation">${cg.data[cg.index].explanation}</div></div><button class="submit-btn" onclick="cg.index++;renderTF()">Next →</button>`;
+        }
+
+        // FILL IN BLANK
+        function startFIB() {
+            const cs = shuffle([...DBT_DATA.concepts]).slice(0, 10);
+            cg.data = cs.map(c => { const ws = c.definition.split(' '), imp = ws.filter(w => w.length > 4 && !/^(their|about|which|would|could|should|where|there|these|those|other|being|having|without|through|between|before|during|within)$/i.test(w)), tw = imp.length ? imp[Math.floor(Math.random() * imp.length)] : ws[Math.floor(Math.random() * ws.length)], ct = tw.replace(/[.,;:!?'"()]/g, ''); return { c, blank: c.definition.replace(tw, '_____'), answer: ct.toLowerCase() }; });
+            cg.total = cg.data.length; renderFIB();
+        }
+        function renderFIB() {
+            const a = document.getElementById('game-play-area');
+            if (cg.index >= cg.data.length) { showComplete(cg.score, cg.total, cg.score * 18, '✏️ Fill in the Blank'); return; }
+            const q = cg.data[cg.index], m = DBT_DATA.modules[q.c.module];
+            a.innerHTML = `<div class="game-area">${gh('✏️ Fill in the Blank', `<span>Q${cg.index + 1}/${cg.total}</span><span>Score: ${cg.score}</span>`)}
+<div class="progress-bar"><div class="progress-fill" style="width:${cg.index / cg.total * 100}%"></div></div>
+<div class="question-container"><span class="question-module-tag">${m.icon} ${m.name}</span>
+<div class="question-number">${q.c.term}</div>
+<div class="question-text" style="font-size:1rem;font-weight:400;">${q.blank}</div>
+<input type="text" class="fill-blank-input" id="fib-in" placeholder="Type the missing word..." autocomplete="off" onkeypress="if(event.key==='Enter')checkFIB()">
+<button class="submit-btn" onclick="checkFIB()">Check</button>
+<div id="fib-fb"></div></div></div>`;
+            document.getElementById('fib-in').focus();
+        }
+        function checkFIB() {
+            const inp = document.getElementById('fib-in'), ua = inp.value.trim().toLowerCase(), q = cg.data[cg.index], ok = ua === q.answer || lev(ua, q.answer) <= 1;
+            if (ok) cg.score++; recordAnswer(ok); inp.classList.add(ok ? 'correct-input' : 'incorrect-input'); inp.disabled = true;
+            document.getElementById('fib-fb').innerHTML = `<div class="feedback ${ok ? 'correct' : 'incorrect'}-feedback">${ok ? '✅ Correct!' : `❌ Answer: "${q.answer}"`}</div><button class="submit-btn" onclick="cg.index++;renderFIB()">Next →</button>`;
+        }
+
+        // MATCHING
+        function startMatch() {
+            const cs = shuffle([...DBT_DATA.concepts]).slice(0, 6); let cards = [];
+            cs.forEach(c => { cards.push({ id: c.id, type: 'term', text: c.term, pid: c.id }); cards.push({ id: c.id + 1000, type: 'def', text: c.definition.length > 60 ? c.definition.substring(0, 57) + '...' : c.definition, pid: c.id }); });
+            cg.data = shuffle(cards); cg.total = cs.length; cg.matched = new Set(); cg.selected = null; renderMatch();
+        }
+        function renderMatch() {
+            document.getElementById('game-play-area').innerHTML = `<div class="game-area">${gh('🔗 Matching', `<span>Matched: ${cg.score}/${cg.total}</span>`)}
+<p style="color:var(--text-secondary);font-size:0.85rem;margin-bottom:16px;">Tap a term, then its definition</p>
+<div class="match-grid">${cg.data.map((c, i) => `<div class="match-card ${cg.matched.has(c.pid) ? 'matched' : ''}" onclick="selMatch(${i})" style="font-size:${c.type === 'def' ? '0.75rem' : '0.85rem'};font-weight:${c.type === 'term' ? '700' : '400'};">${c.text}</div>`).join('')}</div></div>`;
+        }
+        function selMatch(i) {
+            const c = cg.data[i]; if (cg.matched.has(c.pid)) return;
+            const els = document.querySelectorAll('.match-card');
+            if (cg.selected === null) { cg.selected = i; els[i].classList.add('selected'); }
+            else if (cg.selected === i) { els[i].classList.remove('selected'); cg.selected = null; }
+            else {
+                const p = cg.data[cg.selected], pe = els[cg.selected];
+                if (p.pid === c.pid && p.type !== c.type) { cg.matched.add(c.pid); cg.score++; recordAnswer(true); addXP(10); els[i].classList.add('matched'); pe.classList.add('matched'); pe.classList.remove('selected'); cg.selected = null; if (cg.score >= cg.total) setTimeout(() => showComplete(cg.score, cg.total, cg.score * 10, '🔗 Matching'), 500); }
+                else { recordAnswer(false); els[i].classList.add('wrong'); pe.classList.add('wrong'); pe.classList.remove('selected'); cg.selected = null; setTimeout(() => { els[i].classList.remove('wrong'); pe.classList.remove('wrong'); }, 600); }
+            }
+        }
+
+        // ACRONYM BUILDER
+        function startAcro() {
+            const ks = shuffle(Object.keys(DBT_DATA.acronyms)).slice(0, 5);
+            cg.data = ks.map(k => ({ acro: k, letters: k.split(''), meanings: DBT_DATA.acronyms[k], cur: 0 }));
+            cg.total = ks.reduce((s, k) => s + DBT_DATA.acronyms[k].length, 0); cg.acroIdx = 0; renderAcro();
+        }
+        function renderAcro() {
+            const a = document.getElementById('game-play-area');
+            if (cg.acroIdx >= cg.data.length) { showComplete(cg.score, cg.total, cg.score * 10, '🔤 Acronym Builder'); return; }
+            const q = cg.data[cg.acroIdx];
+            if (q.cur >= q.meanings.length) { cg.acroIdx++; renderAcro(); return; }
+            const l = q.letters[q.cur], cm = q.meanings[q.cur], wm = shuffle(Object.values(DBT_DATA.acronyms).flat().filter(m => m !== cm)).slice(0, 3), opts = shuffle([cm, ...wm]);
+            const prog = q.letters.map((c, i) => i < q.cur ? `<span style="color:var(--success);font-weight:800;">${c}</span>` : i === q.cur ? `<span style="color:var(--accent-2);font-weight:800;font-size:1.5em;text-decoration:underline;">${c}</span>` : `<span style="color:var(--text-muted);">${c}</span>`).join(' ');
+            a.innerHTML = `<div class="game-area">${gh('🔤 Acronym Builder', `<span>Score: ${cg.score}</span>`)}
+<div class="question-container" style="text-align:center;">
+<div style="font-size:2rem;letter-spacing:8px;margin-bottom:8px;">${prog}</div>
+<div style="color:var(--text-secondary);font-size:0.85rem;">What does <strong style="color:var(--accent-2);">${l}</strong> stand for in ${q.acro}?</div>
+<div style="display:flex;flex-wrap:wrap;gap:8px;margin:12px 0;">${q.meanings.slice(0, q.cur).map(m => `<span style="background:rgba(0,184,148,0.15);color:var(--success);padding:6px 12px;border-radius:8px;font-size:0.8rem;">✅ ${m}</span>`).join('')}</div>
+<div class="options-list" id="acro-opts">${opts.map((o, i) => `<button class="option-btn" onclick="ansAcro(this)"><span class="option-letter">${String.fromCharCode(65 + i)}</span><span>${o}</span></button>`).join('')}</div>
+<div id="acro-fb"></div></div></div>`;
+        }
+        function ansAcro(btn) {
+            const q = cg.data[cg.acroIdx], cm = q.meanings[q.cur], sel = btn.querySelector('span:last-child').textContent, ok = sel === cm;
+            document.querySelectorAll('#acro-opts .option-btn').forEach(b => { b.classList.add('disabled'); if (b.querySelector('span:last-child').textContent === cm) b.classList.add('correct'); });
+            if (!ok) btn.classList.add('incorrect');
+            if (ok) cg.score++; recordAnswer(ok); q.cur++;
+            document.getElementById('acro-fb').innerHTML = `<div class="feedback ${ok ? 'correct' : 'incorrect'}-feedback">${ok ? '✅ Correct!' : `❌ It's: "${cm}"`}</div><button class="submit-btn" onclick="renderAcro()">Next →</button>`;
+        }
+
+        // SCENARIO
+        function startScen() { cg.data = shuffle([...DBT_DATA.scenarios]); cg.total = cg.data.length; renderScen(); }
+        function renderScen() {
+            const a = document.getElementById('game-play-area');
+            if (cg.index >= cg.data.length) { showComplete(cg.score, cg.total, cg.score * 20, '🎭 Scenario'); return; }
+            const q = cg.data[cg.index], m = DBT_DATA.modules[q.module], L = 'ABCD';
+            a.innerHTML = `<div class="game-area">${gh('🎭 Scenario', `<span>Q${cg.index + 1}/${cg.total}</span><span>Score: ${cg.score}</span>`)}
+<div class="progress-bar"><div class="progress-fill" style="width:${cg.index / cg.total * 100}%"></div></div>
+<div class="question-container"><span class="question-module-tag">${m.icon} ${m.name}</span>
+<div class="scenario-box"><div class="scenario-label">📋 Scenario</div>${q.scenario}</div>
+<div class="question-text">${q.question}</div>
+<div class="options-list" id="sc-opts">${q.options.map((o, i) => `<button class="option-btn" onclick="ansScen(${i},${q.correct})"><span class="option-letter">${L[i]}</span><span>${o}</span></button>`).join('')}</div>
+<div id="sc-fb"></div></div></div>`;
+        }
+        function ansScen(s, c) {
+            document.querySelectorAll('#sc-opts .option-btn').forEach((b, i) => { b.classList.add('disabled'); if (i === c) b.classList.add('correct'); if (i === s && i !== c) b.classList.add('incorrect'); });
+            const ok = s === c; if (ok) cg.score++; recordAnswer(ok);
+            document.getElementById('sc-fb').innerHTML = `<div class="feedback ${ok ? 'correct' : 'incorrect'}-feedback">${ok ? '✅ Excellent!' : '❌ Not quite.'}<div class="feedback-explanation">${cg.data[cg.index].explanation}</div></div><button class="submit-btn" onclick="cg.index++;renderScen()">Next →</button>`;
+        }
+
+        // MODULE SORT
+        function startSort() { cg.data = shuffle([...DBT_DATA.concepts]).slice(0, 12); cg.total = cg.data.length; renderSort(); }
+        function renderSort() {
+            const a = document.getElementById('game-play-area');
+            if (cg.index >= cg.data.length) { showComplete(cg.score, cg.total, cg.score * 12, '📦 Module Sorter'); return; }
+            const c = cg.data[cg.index], mods = shuffle(Object.keys(DBT_DATA.modules));
+            a.innerHTML = `<div class="game-area">${gh('📦 Module Sorter', `<span>Q${cg.index + 1}/${cg.total}</span><span>Score: ${cg.score}</span>`)}
+<div class="progress-bar"><div class="progress-fill" style="width:${cg.index / cg.total * 100}%"></div></div>
+<div class="question-container"><div class="question-text">Which module: <strong style="color:var(--accent-2);">"${c.term}"</strong>?</div>
+<p style="color:var(--text-secondary);font-size:0.85rem;margin-bottom:16px;">${c.definition.substring(0, 80)}...</p>
+<div class="options-list" id="sort-opts">${mods.map(mk => { const m = DBT_DATA.modules[mk]; return `<button class="option-btn" onclick="ansSort('${mk}','${c.module}')"><span class="option-letter">${m.icon}</span><span>${m.name}</span></button>`; }).join('')}</div>
+<div id="sort-fb"></div></div></div>`;
+        }
+        function ansSort(s, c) {
+            document.querySelectorAll('#sort-opts .option-btn').forEach(b => { b.classList.add('disabled'); const mn = b.querySelector('span:last-child').textContent, mk = Object.keys(DBT_DATA.modules).find(k => DBT_DATA.modules[k].name === mn); if (mk === c) b.classList.add('correct'); if (mk === s && mk !== c) b.classList.add('incorrect'); });
+            const ok = s === c; if (ok) cg.score++; recordAnswer(ok);
+            document.getElementById('sort-fb').innerHTML = `<div class="feedback ${ok ? 'correct' : 'incorrect'}-feedback">${ok ? '✅ Correct!' : `❌ It's ${DBT_DATA.modules[c].icon} ${DBT_DATA.modules[c].name}`}</div><button class="submit-btn" onclick="cg.index++;renderSort()">Next →</button>`;
+        }
+
+        // SPEED ROUND
+        function startSpeed() {
+            cg.data = shuffle([...DBT_DATA.concepts]); cg.timeLeft = 60; cg.total = 0; cg.score = 0; cg.index = 0; renderSpd();
+            cg.timer = setInterval(() => { cg.timeLeft--; const t = document.getElementById('spd-timer'); if (t) { t.textContent = cg.timeLeft + 's'; if (cg.timeLeft <= 10) t.parentElement.classList.add('urgent'); } if (cg.timeLeft <= 0) { clearInterval(cg.timer); showComplete(cg.score, Math.max(cg.total, 1), cg.score * 8, '⚡ Speed Round'); } }, 1000);
+        }
+        function renderSpd() {
+            if (cg.index >= cg.data.length) cg.index = 0;
+            const c = cg.data[cg.index], wrong = shuffle(DBT_DATA.concepts.filter(x => x.id !== c.id)).slice(0, 3), opts = shuffle([c, ...wrong]), ci = opts.indexOf(c);
+            document.getElementById('game-play-area').innerHTML = `<div class="game-area">${gh('⚡ Speed Round', `<div class="timer"><span>⏱</span><span id="spd-timer">${cg.timeLeft}s</span></div><span>Score: ${cg.score}</span>`)}
+<div class="question-container"><div class="question-text" style="font-size:1rem;">${c.definition.substring(0, 100)}${c.definition.length > 100 ? '...' : ''}</div>
+<div class="options-list" id="spd-opts">${opts.map((o, i) => `<button class="option-btn" onclick="ansSpd(${i},${ci})" style="padding:12px 16px;"><span class="option-letter">${String.fromCharCode(65 + i)}</span><span>${o.term}</span></button>`).join('')}</div></div></div>`;
+        }
+        function ansSpd(s, c) {
+            cg.total++; const ok = s === c; if (ok) cg.score++; recordAnswer(ok);
+            const bs = document.querySelectorAll('#spd-opts .option-btn'); bs[c].classList.add('correct'); if (!ok) bs[s].classList.add('incorrect');
+            cg.index++; setTimeout(renderSpd, 400);
+        }
+
+        // WORD SCRAMBLE
+        function startScramble() {
+            cg.data = shuffle([...DBT_DATA.concepts]).filter(c => c.term.length <= 15).slice(0, 8).map(c => ({ term: c.term, hint: c.definition.substring(0, 80) + '...', module: c.module, scrambled: scramble(c.term) }));
+            cg.total = cg.data.length; cg.index = 0; renderScram();
+        }
+        function scramble(w) { const c = w.split(''); for (let i = c.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1));[c[i], c[j]] = [c[j], c[i]]; } return c.join('') === w ? scramble(w) : c; }
+        function renderScram() {
+            const a = document.getElementById('game-play-area');
+            if (cg.index >= cg.data.length) { showComplete(cg.score, cg.total, cg.score * 15, '🔀 Word Unscramble'); return; }
+            const q = cg.data[cg.index], m = DBT_DATA.modules[q.module]; cg.currentAnswer = []; cg.usedIndices = new Set();
+            a.innerHTML = `<div class="game-area">${gh('🔀 Word Unscramble', `<span>Q${cg.index + 1}/${cg.total}</span><span>Score: ${cg.score}</span>`)}
+<div class="progress-bar"><div class="progress-fill" style="width:${cg.index / cg.total * 100}%"></div></div>
+<div class="question-container" style="text-align:center;"><span class="question-module-tag">${m.icon} ${m.name}</span>
+<div class="question-text" style="font-size:0.9rem;font-weight:400;">Hint: ${q.hint}</div>
+<div class="answer-slots" id="ans-disp">${q.term.split('').map(() => '<div class="answer-slot"></div>').join('')}</div>
+<div class="letter-tiles" id="ltiles">${q.scrambled.map((c, i) => `<div class="letter-tile" onclick="pickL(${i},'${esc(c)}')">${c}</div>`).join('')}</div>
+<div style="display:flex;gap:8px;justify-content:center;"><button class="back-btn" onclick="clearScram()">Clear</button><button class="submit-btn" onclick="checkScram()">Check</button></div>
+<div id="scram-fb"></div></div></div>`;
+        }
+        function pickL(i, ch) { const q = cg.data[cg.index]; if (cg.currentAnswer.length >= q.term.length || cg.usedIndices.has(i)) return; cg.currentAnswer.push({ i, ch }); cg.usedIndices.add(i); document.querySelectorAll('#ltiles .letter-tile')[i].classList.add('used'); document.querySelectorAll('#ans-disp .answer-slot')[cg.currentAnswer.length - 1].textContent = ch; }
+        function clearScram() { cg.currentAnswer = []; cg.usedIndices = new Set(); document.querySelectorAll('.letter-tile').forEach(t => t.classList.remove('used')); document.querySelectorAll('.answer-slot').forEach(s => s.textContent = ''); }
+        function checkScram() { const q = cg.data[cg.index], ans = cg.currentAnswer.map(a => a.ch).join(''), ok = ans.toLowerCase() === q.term.toLowerCase(); if (ok) cg.score++; recordAnswer(ok); document.getElementById('scram-fb').innerHTML = `<div class="feedback ${ok ? 'correct' : 'incorrect'}-feedback">${ok ? '✅ Correct!' : `❌ Answer: "${q.term}"`}</div><button class="submit-btn" onclick="cg.index++;renderScram()">Next →</button>`; }
+
+        // SEQUENCE
+        function startSeq() {
+            const ks = shuffle(Object.keys(DBT_DATA.acronyms)).slice(0, 4);
+            cg.data = ks.map(k => ({ acro: k, steps: DBT_DATA.acronyms[k], shuffled: shuffle([...DBT_DATA.acronyms[k]].map((s, i) => ({ text: s, cp: i }))) }));
+            cg.total = ks.length; cg.index = 0; renderSeq();
+        }
+        let dragIdx = null;
+        function renderSeq() {
+            const a = document.getElementById('game-play-area');
+            if (cg.index >= cg.data.length) { showComplete(cg.score, cg.total, cg.score * 20, '📋 Skill Sequencer'); return; }
+            const q = cg.data[cg.index];
+            a.innerHTML = `<div class="game-area">${gh('📋 Sequencer', `<span>Q${cg.index + 1}/${cg.total}</span>`)}
+<div class="progress-bar"><div class="progress-fill" style="width:${cg.index / cg.total * 100}%"></div></div>
+<div class="question-container"><div class="question-text">Order the steps of <strong style="color:var(--accent-2);">${q.acro}</strong>:</div>
+<div id="seq-items">${q.shuffled.map((s, i) => `<div class="sequence-item" onclick="tapSeq(${i})"><span class="seq-num">${i + 1}</span><span>${s.text}</span></div>`).join('')}</div>
+<button class="submit-btn" onclick="checkSeq()" style="margin-top:16px;">Check Order</button>
+<div id="seq-fb"></div></div></div>`;
+            dragIdx = null;
+        }
+        function tapSeq(i) {
+            const els = document.querySelectorAll('.sequence-item');
+            if (dragIdx === null) { dragIdx = i; els[i].style.borderColor = 'var(--accent-2)'; }
+            else { if (dragIdx !== i) { const q = cg.data[cg.index];[q.shuffled[dragIdx], q.shuffled[i]] = [q.shuffled[i], q.shuffled[dragIdx]]; } els.forEach(e => e.style.borderColor = ''); dragIdx = null; renderSeq(); }
+        }
+        function checkSeq() {
+            const q = cg.data[cg.index]; let ok = true;
+            document.querySelectorAll('.sequence-item').forEach((el, i) => { if (q.shuffled[i].cp === i) el.classList.add('correct-pos'); else { el.classList.add('incorrect-pos'); ok = false; } });
+            if (ok) cg.score++; recordAnswer(ok);
+            document.getElementById('seq-fb').innerHTML = `<div class="feedback ${ok ? 'correct' : 'incorrect'}-feedback">${ok ? '✅ Perfect!' : '❌ Correct order:'} ${!ok ? '<div class="feedback-explanation">' + q.steps.map((s, i) => `${i + 1}. ${s}`).join('<br>') + '</div>' : ''}</div><button class="submit-btn" onclick="cg.index++;renderSeq()">Next →</button>`;
+        }
+
+        // CONNECTIONS
+        function startConn() {
+            const qs = [
+                { q: "Which two concepts form Wise Mind?", o: ["Reasonable Mind + Emotion Mind", "DEAR MAN + GIVE", "Observe + Describe", "Problem Solving + Opposite Action"], c: 0, e: "Wise Mind integrates Reasonable Mind and Emotion Mind." },
+                { q: "When emotion fits the facts, use ___ instead of Opposite Action:", o: ["Radical Acceptance", "Problem Solving", "TIPP", "Distraction"], c: 1, e: "Problem Solving for justified emotions; Opposite Action for unjustified." },
+                { q: "DEAR MAN, GIVE, FAST address which three priorities?", o: ["Past, Present, Future", "Objectives, Relationship, Self-Respect", "Mind, Body, Spirit", "Thinking, Feeling, Doing"], c: 1, e: "DEAR MAN=Objectives, GIVE=Relationship, FAST=Self-Respect." },
+                { q: "Which sequence shows: vulnerability → emotion check → response change?", o: ["PLEASE → Check the Facts → Opposite Action", "TIPP → STOP → DEAR MAN", "Observe → Describe → Participate", "ACCEPT → IMPROVE → Radical Acceptance"], c: 0, e: "PLEASE reduces vulnerability, Check the Facts examines emotion, Opposite Action changes response." },
+                { q: "Radical Acceptance and Turning the Mind belong to which category?", o: ["Crisis Survival", "Reality Acceptance Skills", "Emotion Regulation", "What Skills"], c: 1, e: "Both are Reality Acceptance Skills in Distress Tolerance." },
+                { q: "What bridges rejection and Radical Acceptance?", o: ["Willingness", "Turning the Mind", "Half-Smiling", "Wise Mind"], c: 1, e: "Turning the Mind is the repeated choice — the bridge to acceptance." },
+                { q: "'What' and 'How' skills together make up which module?", o: ["Distress Tolerance", "Emotion Regulation", "Core Mindfulness", "Interpersonal Effectiveness"], c: 2, e: "What (Observe, Describe, Participate) + How (Non-Judgmentally, One-Mindfully, Effectively) = Core Mindfulness." },
+                { q: "Pain + Non-Acceptance = Suffering relates to which concept?", o: ["Opposite Action", "Radical Acceptance", "Check the Facts", "PLEASE"], c: 1, e: "Radical Acceptance reduces suffering by accepting unchangeable pain." }
+            ];
+            cg.data = shuffle(qs).slice(0, 6); cg.total = cg.data.length; cg.index = 0; renderConn();
+        }
+        function renderConn() {
+            const a = document.getElementById('game-play-area');
+            if (cg.index >= cg.data.length) { showComplete(cg.score, cg.total, cg.score * 20, '🕸️ Connections'); return; }
+            const q = cg.data[cg.index], L = 'ABCD';
+            a.innerHTML = `<div class="game-area">${gh('🕸️ Connections', `<span>Q${cg.index + 1}/${cg.total}</span><span>Score: ${cg.score}</span>`)}
+<div class="progress-bar"><div class="progress-fill" style="width:${cg.index / cg.total * 100}%"></div></div>
+<div class="question-container"><div class="question-text">${q.q}</div>
+<div class="options-list" id="cn-opts">${q.o.map((o, i) => `<button class="option-btn" onclick="ansConn(${i},${q.c})"><span class="option-letter">${L[i]}</span><span>${o}</span></button>`).join('')}</div>
+<div id="cn-fb"></div></div></div>`;
+        }
+        function ansConn(s, c) {
+            document.querySelectorAll('#cn-opts .option-btn').forEach((b, i) => { b.classList.add('disabled'); if (i === c) b.classList.add('correct'); if (i === s && i !== c) b.classList.add('incorrect'); });
+            const ok = s === c; if (ok) cg.score++; recordAnswer(ok);
+            document.getElementById('cn-fb').innerHTML = `<div class="feedback ${ok ? 'correct' : 'incorrect'}-feedback">${ok ? '✅ Correct!' : '❌ Not quite.'}<div class="feedback-explanation">${cg.data[cg.index].e}</div></div><button class="submit-btn" onclick="cg.index++;renderConn()">Next →</button>`;
+        }
+
+        // =====================================================
+        // TEST GENERATOR
+        // =====================================================
+        let ts = { questions: [], index: 0, score: 0, answers: [] };
+
+        function startTest() {
+            const count = parseInt(document.getElementById('test-count').value),
+                mods = [...document.querySelectorAll('.test-module-check:checked')].map(c => c.value),
+                types = [...document.querySelectorAll('.test-type-check:checked')].map(c => c.value);
+            if (!mods.length || !types.length) { alert('Select at least one module and type.'); return; }
+            const fc = DBT_DATA.concepts.filter(c => mods.includes(c.module)), ft = DBT_DATA.trueFalse.filter(t => mods.includes(t.module));
+            let qs = [];
+            for (let i = 0; i < count; i++) {
+                const type = types[Math.floor(Math.random() * types.length)];
+                if (type === 'mc') { const c = fc[Math.floor(Math.random() * fc.length)], w = shuffle(DBT_DATA.concepts.filter(x => x.id !== c.id)).slice(0, 3).map(x => x.term), o = shuffle([c.term, ...w]); qs.push({ type: 'mc', module: c.module, question: `Which term matches:\n"${c.definition}"`, options: o, correct: o.indexOf(c.term), explanation: c.detail || '', link: c.link }); }
+                else if (type === 'tf' && ft.length) { const t = ft[Math.floor(Math.random() * ft.length)]; qs.push({ type: 'tf', module: t.module, question: t.statement, correct: t.answer, explanation: t.explanation }); }
+                else { const c = fc[Math.floor(Math.random() * fc.length)], ws = c.term.split(' '), tg = ws[Math.floor(Math.random() * ws.length)]; qs.push({ type: 'fib', module: c.module, question: `Complete: "${c.term.replace(tg, '_____')}"`, hint: c.definition.substring(0, 80) + '...', correct: tg.toLowerCase().replace(/[^a-z]/g, ''), explanation: c.definition }); }
+            }
+            ts = { questions: shuffle(qs).slice(0, count), index: 0, score: 0, answers: [] };
+            document.getElementById('test-setup').classList.add('hidden');
+            document.getElementById('test-area').classList.remove('hidden');
+            renderTestQ();
+        }
+
+        function renderTestQ() {
+            const a = document.getElementById('test-area');
+            if (ts.index >= ts.questions.length) { renderTestResults(); return; }
+            const q = ts.questions[ts.index], m = DBT_DATA.modules[q.module], L = 'ABCD';
+            let content = '';
+            if (q.type === 'mc') content = `<div class="options-list" id="t-opts">${q.options.map((o, i) => `<button class="option-btn" onclick="ansTest(${i})"><span class="option-letter">${L[i]}</span><span>${o}</span></button>`).join('')}</div>`;
+            else if (q.type === 'tf') content = `<div class="tf-buttons" id="t-tf"><button class="tf-btn" onclick="ansTest(true)">✅ TRUE</button><button class="tf-btn" onclick="ansTest(false)">❌ FALSE</button></div>`;
+            else content = `<p style="color:var(--text-secondary);font-size:0.85rem;margin-bottom:12px;">Hint: ${q.hint}</p><input type="text" class="fill-blank-input" id="t-fib" placeholder="Answer..." autocomplete="off" onkeypress="if(event.key==='Enter')subTestFib()"><button class="submit-btn" onclick="subTestFib()">Submit</button>`;
+            a.innerHTML = `<div class="game-area"><div class="game-header"><button class="back-btn" onclick="document.getElementById('test-setup').classList.remove('hidden');document.getElementById('test-area').classList.add('hidden');">← Exit</button><div class="game-title">📝 Test</div><div class="game-meta"><span>Q${ts.index + 1}/${ts.questions.length}</span><span>Score: ${ts.score}</span></div></div>
+<div class="progress-bar"><div class="progress-fill" style="width:${ts.index / ts.questions.length * 100}%"></div></div>
+<div class="question-container"><span class="question-module-tag">${m.icon} ${m.name}</span>
+<span class="question-module-tag" style="margin-left:8px;background:rgba(253,121,168,0.15);color:var(--accent-3);">${q.type === 'mc' ? 'Multiple Choice' : q.type === 'tf' ? 'True/False' : 'Fill in Blank'}</span>
+<div class="question-text" style="white-space:pre-line;margin-top:12px;">${q.question}</div>
+${content}<div id="t-fb"></div></div></div>`;
+            if (q.type === 'fib') document.getElementById('t-fib')?.focus();
+        }
+
+        function ansTest(ans) {
+            const q = ts.questions[ts.index]; let ok = false;
+            if (q.type === 'mc') { ok = ans === q.correct; document.querySelectorAll('#t-opts .option-btn').forEach((b, i) => { b.classList.add('disabled'); if (i === q.correct) b.classList.add('correct'); if (i === ans && !ok) b.classList.add('incorrect'); }); }
+            else if (q.type === 'tf') { ok = ans === q.correct; const bs = document.querySelectorAll('#t-tf .tf-btn'); bs.forEach(b => b.classList.add('disabled')); bs[0].classList.add(q.correct === true ? 'correct-tf' : (ans === true ? 'incorrect-tf' : '')); bs[1].classList.add(q.correct === false ? 'correct-tf' : (ans === false ? 'incorrect-tf' : '')); }
+            if (ok) ts.score++; recordAnswer(ok); ts.answers.push({ i: ts.index, ok });
+            document.getElementById('t-fb').innerHTML = `<div class="feedback ${ok ? 'correct' : 'incorrect'}-feedback">${ok ? '✅ Correct!' : '❌ Incorrect'}${q.explanation ? `<div class="feedback-explanation">${q.explanation}</div>` : ''}${q.link ? `<a href="${q.link}" target="_blank" class="info-link" style="display:block;margin-top:8px;">📖 More ↗</a>` : ''}</div><button class="submit-btn" onclick="ts.index++;renderTestQ()">Next →</button>`;
+        }
+
+        function subTestFib() {
+            const inp = document.getElementById('t-fib'); if (!inp) return;
+            const q = ts.questions[ts.index], ans = inp.value.trim().toLowerCase().replace(/[^a-z]/g, ''), ok = ans === q.correct || lev(ans, q.correct) <= 1;
+            if (ok) ts.score++; recordAnswer(ok); ts.answers.push({ i: ts.index, ok });
+            inp.disabled = true; inp.classList.add(ok ? 'correct-input' : 'incorrect-input');
+            document.getElementById('t-fb').innerHTML = `<div class="feedback ${ok ? 'correct' : 'incorrect'}-feedback">${ok ? '✅ Correct!' : `❌ Answer: "${q.correct}"`}${q.explanation ? `<div class="feedback-explanation">${q.explanation}</div>` : ''}</div><button class="submit-btn" onclick="ts.index++;renderTestQ()">Next →</button>`;
+        }
+
+        function renderTestResults() {
+            const pct = Math.round(ts.score / ts.questions.length * 100), grade = pct >= 90 ? 'A+' : pct >= 80 ? 'A' : pct >= 70 ? 'B' : pct >= 60 ? 'C' : 'F', xp = ts.score * 10 + (pct >= 80 ? 50 : 0);
+            state.gamesCompleted++; addXP(xp);
+            const mb = {}; ts.questions.forEach((q, i) => { if (!mb[q.module]) mb[q.module] = { c: 0, t: 0 }; mb[q.module].t++; if (ts.answers[i]?.ok) mb[q.module].c++; });
+            document.getElementById('test-area').innerHTML = `<div class="game-area"><div class="score-display">
+<div class="score-circle" style="background:rgba(108,92,231,0.15);font-size:2.5rem;">${grade}</div>
+<div class="score-grade">${pct}% — ${ts.score}/${ts.questions.length}</div>
+<div class="score-detail">+${xp} XP${pct >= 80 ? ' • 🌟 Bonus 50 XP!' : ''}</div>
+<div style="text-align:left;margin:20px 0;"><h3 style="margin-bottom:12px;">Module Breakdown:</h3>
+${Object.entries(mb).map(([mod, d]) => { const m = DBT_DATA.modules[mod], p = Math.round(d.c / d.t * 100); return `<div style="margin-bottom:8px;"><div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span>${m.icon} ${m.name}</span><span style="font-weight:700;">${d.c}/${d.t} (${p}%)</span></div><div class="progress-bar" style="height:6px;margin:0;"><div class="progress-fill" style="width:${p}%;background:${p >= 70 ? 'var(--gradient-3)' : 'var(--gradient-2)'};"></div></div></div>`; }).join('')}
+</div>
+<div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+<button class="submit-btn" onclick="document.getElementById('test-setup').classList.remove('hidden');document.getElementById('test-area').classList.add('hidden');">📝 New Test</button>
+<button class="back-btn" onclick="showSection('scores')">🏆 Leaderboard</button></div></div></div>`;
+        }
+
+        // =====================================================
+        // UTILITIES
+        // =====================================================
+        function shuffle(a) { const b = [...a]; for (let i = b.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1));[b[i], b[j]] = [b[j], b[i]]; } return b; }
+        function esc(s) { return s.replace(/'/g, "\\'").replace(/"/g, '\\"'); }
+        function lev(a, b) { const m = a.length, n = b.length, d = Array.from({ length: m + 1 }, (_, i) => Array.from({ length: n + 1 }, (_, j) => i === 0 ? j : j === 0 ? i : 0)); for (let i = 1; i <= m; i++)for (let j = 1; j <= n; j++)d[i][j] = Math.min(d[i - 1][j] + 1, d[i][j - 1] + 1, d[i - 1][j - 1] + (a[i - 1] !== b[j - 1] ? 1 : 0)); return d[m][n]; }
+
+        // =====================================================
+        // INIT
+        // =====================================================
+        async function init() {
+            updateStatsDisplay();
+            initGameGrid();
+
+            // Leaderboard init
+            updateShareURL();
+            lbData = JSON.parse(localStorage.getItem('dbt_lb_cache') || '[]');
+            renderLeaderboard();
+
+            if (!state.playerName) setTimeout(showNameModal, 1500);
+
+            document.getElementById('player-name-input').addEventListener('keypress', e => { if (e.key === 'Enter') saveName(); });
+            document.getElementById('name-modal').addEventListener('click', e => { if (e.target === document.getElementById('name-modal')) document.getElementById('name-modal').classList.add('hidden'); });
+        }
+
+        init();
+    </script>
+</body>
+
+</html>
