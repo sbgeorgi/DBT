@@ -1,0 +1,72 @@
+{
+  "modules": {
+    "mindfulness": { "name": "Core Mindfulness", "icon": "🧘", "color": "#55efc4", "desc": "Observe, Describe, Participate" },
+    "distress": { "name": "Distress Tolerance", "icon": "🌊", "color": "#fd79a8", "desc": "Surviving crises without making them worse" },
+    "emotion": { "name": "Emotion Regulation", "icon": "💛", "color": "#fdcb6e", "desc": "Understanding and managing emotions" },
+    "interpersonal": { "name": "Interpersonal Effectiveness", "icon": "🤝", "color": "#a29bfe", "desc": "Asking for what you need & saying no" },
+    "core": { "name": "Core Concepts", "icon": "🌱", "color": "#74b9ff", "desc": "Dialectics and Foundations" }
+  },
+  "concepts": [
+    { "id": 1, "module": "mindfulness", "term": "Wise Mind", "definition": "The integration of Reasonable Mind (logic) and Emotion Mind (feelings). The intuitive knowing that combines both reason and emotion.", "detail": "The middle path between logic and emotion." },
+    { "id": 2, "module": "mindfulness", "term": "Reasonable Mind", "definition": "A state of mind driven purely by facts, logic, and rational thinking — without influence from emotions.", "detail": "Good for building bridges, bad for relationships." },
+    { "id": 3, "module": "mindfulness", "term": "Emotion Mind", "definition": "A state of mind driven by feelings and emotional urges, where thoughts and behaviors are controlled by the current emotional state.", "detail": "Facts may be distorted to fit the emotion." },
+    { "id": 4, "module": "mindfulness", "term": "Observe", "definition": "A 'What' skill: noticing your experience (thoughts, feelings, sensations) without trying to change it.", "detail": "Just watching, like a guard at a gate." },
+    { "id": 5, "module": "mindfulness", "term": "Describe", "definition": "A 'What' skill: putting words on your experience, labeling thoughts as thoughts and feelings as feelings.", "detail": "Sticking to the facts." },
+    { "id": 6, "module": "mindfulness", "term": "Participate", "definition": "A 'What' skill: fully engaging in the current activity, throwing yourself completely into the present moment.", "detail": "Becoming one with what you are doing." },
+    { "id": 7, "module": "mindfulness", "term": "Non-Judgmentally", "definition": "A 'How' skill: seeing things as they are without evaluating as good or bad.", "detail": "Replacing 'This is terrible' with 'This is painful'." },
+    { "id": 8, "module": "mindfulness", "term": "One-Mindfully", "definition": "A 'How' skill: doing one thing at a time with full attention.", "detail": "The opposite of multitasking." },
+    { "id": 9, "module": "mindfulness", "term": "Effectively", "definition": "A 'How' skill: doing what works in the situation, focusing on goals rather than being 'right'.", "detail": "Playing by the rules to get what you need." },
+    { "id": 12, "module": "distress", "term": "TIPP Skills", "definition": "Crisis survival: Temperature (cold water), Intense exercise, Paced breathing, Paired muscle relaxation.", "detail": "Changes body chemistry rapidly." },
+    { "id": 13, "module": "distress", "term": "STOP Skill", "definition": "Crisis survival: Stop, Take a step back, Observe, Proceed mindfully.", "detail": "Prevents impulsive actions." },
+    { "id": 14, "module": "distress", "term": "Radical Acceptance", "definition": "Completely accepting reality as it is, right now, without fighting it.", "detail": "Pain + Non-acceptance = Suffering." },
+    { "id": 15, "module": "distress", "term": "ACCEPTS", "definition": "Distraction skills: Activities, Contributing, Comparisons, Emotions, Pushing away, Thoughts, Sensations.", "detail": "Short-term relief, not avoidance." },
+    { "id": 16, "module": "distress", "term": "Self-Soothe", "definition": "Using the five senses to comfort yourself: Vision, Hearing, Smell, Taste, Touch.", "detail": "Being kind to yourself physically." },
+    { "id": 17, "module": "distress", "term": "IMPROVE the Moment", "definition": "Imagery, Meaning, Prayer, Relaxation, One thing in the moment, Vacation, Encouragement.", "detail": "Improving the quality of the immediate moment." },
+    { "id": 18, "module": "distress", "term": "Pros and Cons", "definition": "Listing advantages and disadvantages of acting on urges vs. resisting them.", "detail": "Helps engage Reasonable Mind." },
+    { "id": 22, "module": "emotion", "term": "ABC PLEASE", "definition": "Accumulate positive experiences, Build mastery, Cope ahead; treat PhysicaL illness, Eating, Altering substances, Sleep, Exercise.", "detail": "Reduces vulnerability to Emotion Mind." },
+    { "id": 23, "module": "emotion", "term": "Check the Facts", "definition": "Examining whether your emotional response fits the actual facts of the situation.", "detail": "Does the emotion fit the facts?" },
+    { "id": 24, "module": "emotion", "term": "Opposite Action", "definition": "Acting opposite to the emotional urge when the emotion does NOT fit the facts.", "detail": "Do it all the way." },
+    { "id": 25, "module": "emotion", "term": "Problem Solving", "definition": "Strategies used when the emotion DOES fit the facts and the situation can be changed.", "detail": "Step-by-step analysis and action." },
+    { "id": 32, "module": "interpersonal", "term": "DEAR MAN", "definition": "Describe, Express, Assert, Reinforce; Mindful, Appear confident, Negotiate.", "detail": "Getting what you want (Objectives)." },
+    { "id": 33, "module": "interpersonal", "term": "GIVE", "definition": "Gentle, Interested, Validate, Easy manner.", "detail": "Keeping the relationship." },
+    { "id": 34, "module": "interpersonal", "term": "FAST", "definition": "Fair, (no) Apologies, Stick to values, Truthful.", "detail": "Keeping your self-respect." },
+    { "id": 35, "module": "interpersonal", "term": "Validation", "definition": "Communicating that another person's thoughts or feelings make sense in their context.", "detail": "It is not agreement." },
+    { "id": 37, "module": "core", "term": "Dialectics", "definition": "The synthesis of opposites. Two things can be true at once (Acceptance AND Change).", "detail": "Walking the middle path." },
+    { "id": 38, "module": "core", "term": "Biosocial Theory", "definition": "Emotional dysregulation comes from biological vulnerability + an invalidating environment.", "detail": "The 'Why' of DBT." },
+    { "id": 39, "module": "distress", "term": "Turning the Mind", "definition": "Choosing to accept reality, over and over again.", "detail": "The bridge to Radical Acceptance." },
+    { "id": 40, "module": "distress", "term": "Willingness", "definition": "Doing what is needed in the situation; participating fully.", "detail": "Opposite of Willfulness." },
+    { "id": 41, "module": "distress", "term": "Half-Smiling", "definition": "Relaxing the face and turning up the corners of the lips to communicate safety to the brain.", "detail": "Body posture changes emotional state." }
+  ],
+  "trueFalse": [
+    { "statement": "Wise Mind is the same as Reasonable Mind.", "answer": false, "module": "mindfulness", "explanation": "Wise Mind integrates BOTH Reasonable Mind and Emotion Mind." },
+    { "statement": "Radical Acceptance means you approve of what happened.", "answer": false, "module": "distress", "explanation": "Radical Acceptance is acknowledging reality, NOT approving of it." },
+    { "statement": "DEAR MAN is primarily used for maintaining self-respect.", "answer": false, "module": "interpersonal", "explanation": "DEAR MAN is for objectives. FAST is for self-respect." },
+    { "statement": "TIPP skills are designed for long-term emotion regulation.", "answer": false, "module": "distress", "explanation": "TIPP is for immediate crisis survival." },
+    { "statement": "Opposite Action should be used when the emotion DOES fit the facts.", "answer": false, "module": "emotion", "explanation": "Use Problem Solving when the emotion fits the facts." },
+    { "statement": "Validation means agreeing with the other person.", "answer": false, "module": "interpersonal", "explanation": "Validation is acknowledging their experience, not necessarily agreeing with it." },
+    { "statement": "Pain + Non-acceptance = Suffering.", "answer": true, "module": "distress", "explanation": "This is a core DBT equation." },
+    { "statement": "The 'How' skills are Non-Judgmentally, One-Mindfully, and Effectively.", "answer": true, "module": "mindfulness", "explanation": "Correct!" },
+    { "statement": "Biosocial theory states dysregulation is purely genetic.", "answer": false, "module": "core", "explanation": "It is Biology + Environment." }
+  ],
+  "scenarios": [
+    { "scenario": "Your friend cancels plans last minute. You feel a surge of anger and want to send a furious text.", "question": "Which skill should you use first?", "options": ["TIPP / STOP", "DEAR MAN", "Build Mastery", "Problem Solving"], "correct": 0, "module": "distress", "explanation": "Use Crisis Survival (STOP/TIPP) to bring arousal down before acting." },
+    { "scenario": "You have a job interview tomorrow and feel overwhelming anxiety. You can't sleep.", "question": "Which skill combination works best?", "options": ["Radical Acceptance", "Cope Ahead + PLEASE", "FAST", "Opposite Action"], "correct": 1, "module": "emotion", "explanation": "Cope Ahead prepares you; PLEASE addresses the sleep." },
+    { "scenario": "You need to ask for a raise, but you are afraid.", "question": "Which framework guides the request?", "options": ["FAST", "GIVE", "DEAR MAN", "STOP"], "correct": 2, "module": "interpersonal", "explanation": "DEAR MAN is for getting what you want (Objectives)." },
+    { "scenario": "You feel sad, but nothing bad has happened. You want to stay in bed all day.", "question": "The emotion does not fit the facts. You should use:", "options": ["Opposite Action", "Problem Solving", "Validation", "Turning the Mind"], "correct": 0, "module": "emotion", "explanation": "When emotion doesn't fit facts, do the Opposite Action (Get up, get active)." }
+  ],
+  "acronyms": {
+    "TIPP": ["Temperature", "Intense exercise", "Paced breathing", "Paired muscle relaxation"],
+    "STOP": ["Stop", "Take a step back", "Observe", "Proceed mindfully"],
+    "DEAR": ["Describe", "Express", "Assert", "Reinforce"],
+    "MAN": ["Mindful", "Appear confident", "Negotiate"],
+    "GIVE": ["Gentle", "Interested", "Validate", "Easy manner"],
+    "FAST": ["Fair", "Apologies (no)", "Stick to values", "Truthful"],
+    "ACCEPTS": ["Activities", "Contributing", "Comparisons", "Emotions", "Pushing away", "Thoughts", "Sensations"],
+    "IMPROVE": ["Imagery", "Meaning", "Prayer", "Relaxation", "One thing", "Vacation", "Encouragement"]
+  },
+  "ordering": [
+    { "title": "STOP Skill", "steps": ["Stop (Don't react)", "Take a step back", "Observe", "Proceed Mindfully"], "module": "distress" },
+    { "title": "DEAR MAN", "steps": ["Describe", "Express", "Assert", "Reinforce", "Mindful", "Appear Confident", "Negotiate"], "module": "interpersonal" },
+    { "title": "Cycle of Emotions", "steps": ["Prompting Event", "Interpretation", "Biological Change", "Action Urge", "Action/Expression", "Aftereffects"], "module": "emotion" }
+  ]
+}
